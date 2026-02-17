@@ -25,5 +25,5 @@ $300 무료 크레딧을 받아주세요!
 
 
 ## 완벽 사용법 필수시청!
-- **<span style="color: #ffff00; font-weight: bold;"></span><a href="https://youtu.be/WKhgss2fIA4" style="color: #4a9eff; text-decoration: underline;">👉 메이크렌즈 완벽 사용법! - 49분 👈</a>**
+- **<span style="color: #ffff00; font-weight: bold;"></span><a href="https://youtu.be/z5x_SbaaPi0" style="color: #4a9eff; text-decoration: underline;">👉 메이크렌즈 완벽 사용법! - 52분 👈</a>**
 - 반드시 위의 사용법 영상을 시청해주세요!
