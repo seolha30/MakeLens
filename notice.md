@@ -12,7 +12,7 @@
 이에, Vertex ai json 방식으로 무료 크레딧 사용가능하도록 추가하였습니다.
 기존 사용자는 남은 크레딧을 Gemini api로 사용가능하니,
 신규 사용자만 Vertex json을 영상을 통해 다운로드 받고 등록하여 사용하시기 바랍니다.
-- **<span style="color: #ffff00; font-weight: bold;"></span><a href="https://youtu.be/zULUuh_s82E" style="color: #4a9eff; text-decoration: underline;">👉 Vertex Json 키 & $300 크레딧 받는 법! 👈</a>**
+- **<span style="color: #ffff00; font-weight: bold;"></span><a href="https://youtu.be/tbU1uNAQL0Q" style="color: #4a9eff; text-decoration: underline;">👉 Vertex Json 키 & $300 크레딧 받는 법! 👈</a>**
 3) 그록 확장앱 일부 감지기능 개선 (새로고침 / 재설치 필수!)
 4) 썸네일 제작 버그 수정
 
