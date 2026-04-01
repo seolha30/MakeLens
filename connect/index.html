@@ -3923,6 +3923,11 @@
                 closeTtalkkakModal();
                 // 진행 패널 표시 + 실시간 상태 리스너 시작
                 showProgressPanel();
+                // 동영상 생성 토글 켜져있으면 videos 단계 미리 표시
+                if (command.options.video_generation) {
+                    const videosEl = document.getElementById('step-videos');
+                    if (videosEl) videosEl.style.display = '';
+                }
                 listenProgress();
             } catch (err) {
                 showAlert('명령 전송 실패', 'error');
