@@ -1119,10 +1119,216 @@
 
                 <!-- ═══ 탭 네비게이션 ═══ -->
                 <div class="tab-nav" id="tabNav" style="display: none;">
+                    <div class="tab-item" data-tab="0" onclick="switchTab(0)">⚡ 딸깍</div>
                     <div class="tab-item active" data-tab="1" onclick="switchTab(1)">1. 대본</div>
                     <div class="tab-item" data-tab="2" onclick="switchTab(2)">2. 장면/이미지</div>
                     <div class="tab-item" data-tab="3" onclick="switchTab(3)">3. 음성</div>
                     <div class="tab-item" data-tab="4" onclick="switchTab(4)">4. 최종 영상</div>
+                </div>
+
+                <!-- ═══ 탭 0: 딸깍 ═══ -->
+                <div class="tab-content" id="tab0">
+                    <div id="ttalkkakModal">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 20px; font-weight: 700; color: #fff;">⚡ 딸깍! 원클릭 자동화</div>
+                            <div style="font-size: 12px; color: #888; margin-top: 4px;">설정 후 시작하면 전체 파이프라인이 자동 실행됩니다</div>
+                        </div>
+
+                        <!-- Step 1: 비주얼 소스 -->
+                        <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">🎨 Step 1. 비주얼 소스 연출</div>
+                            <div style="margin-bottom: 10px;">
+                                <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">생성 모델</div>
+                                <select id="tkModel" style="width: 100%; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                    <option value="나노바나나2 - 자동" selected>나노바나나2 - 자동</option>
+                                    <option value="나노바나나 프로 - 자동">나노바나나 프로 - 자동</option>
+                                    <option value="나노바나나 일반 - 자동">나노바나나 일반 - 자동</option>
+                                    <option value="이매진 4 Ultra - 자동">이매진 4 Ultra - 자동</option>
+                                    <option value="위스크 (Whisk) - 자동">위스크 (Whisk) - 자동</option>
+                                    <option value="플로우 (Flow) - 자동">플로우 (Flow) - 자동</option>
+                                    <option disabled>────────────</option>
+                                    <option value="나노바나나2 - 1:1">나노바나나2 - 1:1</option>
+                                    <option value="나노바나나 프로 - 1:1">나노바나나 프로 - 1:1</option>
+                                    <option value="나노바나나 일반 - 1:1">나노바나나 일반 - 1:1</option>
+                                    <option value="이매진 4 Ultra - 1:1">이매진 4 Ultra - 1:1</option>
+                                    <option value="위스크 (Whisk) - 1:1">위스크 (Whisk) - 1:1</option>
+                                    <option value="플로우 (Flow) - 1:1">플로우 (Flow) - 1:1</option>
+                                </select>
+                            </div>
+                            <div style="background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+                                <div class="option-row"><span class="option-label" style="font-size: 12px;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
+                                <div class="option-row" style="border-bottom: none;"><span class="option-label" style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">스타일</div>
+                                    <select id="tkStyle" style="width: 100%; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                        <option>커스텀</option><option>감성 수채화</option><option>실사</option><option>3D 애니메이션</option><option>사이버펑크</option><option>클레이 애니메이션</option><option>미국 코믹북</option><option>연필 스케치</option><option>팝아트</option><option>일본 애니메이션</option><option>픽셀아트</option><option>파스텔 몽환</option><option>종이공예</option><option>유화 명화</option><option>인포그래픽</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">이미지 수</div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <select id="tkSplit" onchange="onTkSplitChange()" style="flex: 1; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="per_sentence">문장 당</option><option value="default">기본(복합)</option><option value="total">전체 수</option>
+                                        </select>
+                                        <input type="number" id="tkSplitCount" value="1" min="1" max="100" style="width: 42px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 6px; color: #fff; padding: 6px; text-align: center; font-size: 12px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: AI 음성 -->
+                        <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">🎙️ Step 2. AI 음성 및 나레이션</div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="gemini" checked onchange="onTkTtsChange()" style="accent-color: #667eea;"> Gemini</label>
+                                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="elevenlabs" onchange="onTkTtsChange()" style="accent-color: #667eea;"> ElevenLabs</label>
+                                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="typecast" onchange="onTkTtsChange()" style="accent-color: #667eea;"> Typecast</label>
+                                <span id="tkCredits" style="margin-left: auto; font-size: 11px; color: #888; display: none;">💳 <span id="tkCreditsValue" style="color: #8fa4f0; font-weight: 600;"></span></span>
+                            </div>
+                            <!-- Gemini 옵션 -->
+                            <div id="tkGeminiOpts" style="margin-bottom: 14px;">
+                                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">목소리</div>
+                                        <select id="tkVoice" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <optgroup label="남성"><option value="Orus">태성</option><option value="Charon">민수</option><option value="Alnilam">승우</option><option value="Puck">지한</option><option value="Algenib">성진</option><option value="Fenrir">현우</option><option value="Iapetus">민혁</option><option value="Umbriel">준호</option><option value="Achird">동혁</option><option value="Enceladus">서준</option></optgroup>
+                                            <optgroup label="여성"><option value="Leda">유나</option><option value="Kore" selected>서연</option><option value="Aoede">민지</option><option value="Gacrux">은지</option><option value="Zephyr">소희</option><option value="Callirrhoe">수진</option><option value="Laomedeia">지수</option><option value="Autonoe">소은</option><option value="Achernar">지선</option><option value="Despina">하윤</option></optgroup>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">말투 스타일</div>
+                                        <select id="tkTtsStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option>기본</option><option>명랑하게</option><option>차분하게</option><option>강하고 단호하게</option><option>뉴스 리포터처럼</option><option>다정하고 따뜻하게</option><option>진지하고 엄격하게</option><option>속삭이는 듯</option><option>슬프고 애절하게</option><option>신비롭고 몽환적으로</option><option>긴장감 있게</option><option>전문가처럼 박식하게</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
+                                        <select id="tkGeminiSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="0.8">0.8x 느림</option><option value="0.9">0.9x</option><option value="1.0">1.0x 보통</option><option value="1.1" selected>1.1x 기본</option><option value="1.2">1.2x</option><option value="1.3">1.3x 빠름</option><option value="1.5">1.5x</option><option value="2.0">2.0x 최대</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 6px; padding-bottom: 2px;">
+                                        <span style="font-size: 12px; color: #aaa; white-space: nowrap;">500자 분할</span>
+                                        <label class="toggle"><input type="checkbox" id="tkGeminiSplit500" checked><span class="slider"></span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ElevenLabs 옵션 -->
+                            <div id="tkElOpts" style="display: none; margin-bottom: 14px;">
+                                <div style="margin-bottom: 8px;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">음성 선택</div>
+                                    <button id="tkElVoiceBtn" onclick="openTkVoicePicker('elevenlabs')" style="width: 100%; padding: 9px 10px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #8fa4f0; font-size: 12px; cursor: pointer; text-align: left;">목소리 선택</button>
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">모델</div>
+                                        <select id="tkElModel" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="eleven_v3">v3 최신</option><option value="eleven_multilingual_v2" selected>다국어 v2</option><option value="eleven_turbo_v2_5">터보 v2.5</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">안정성</div>
+                                        <select id="tkElStability" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="0.0">개성/생동감</option><option value="0.5" selected>보통</option><option value="1.0">차분</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
+                                        <select id="tkElSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="0.8">느림</option><option value="1.0" selected>보통</option><option value="1.2">빠름</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Typecast 옵션 -->
+                            <div id="tkTcOpts" style="display: none; margin-bottom: 14px;">
+                                <div style="margin-bottom: 8px;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">음성 선택</div>
+                                    <button id="tkTcVoiceBtn" onclick="openTkVoicePicker('typecast')" style="width: 100%; padding: 9px 10px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #8fa4f0; font-size: 12px; cursor: pointer; text-align: left;">목소리 선택</button>
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">감정</div>
+                                        <select id="tkTcEmotion" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="normal" selected>🤖 자동</option><option value="happy">😊 기쁨</option><option value="sad">😢 슬픔</option><option value="angry">😠 화남</option><option value="whisper">🤫 속삭임</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">강도</div>
+                                        <select id="tkTcIntensity" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="1.0">약하게</option><option value="1.5" selected>보통</option><option value="2.0">강하게</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
+                                        <select id="tkTcSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                            <option value="0.8">느림</option><option value="1.0" selected>보통</option><option value="1.2">빠름</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /Step 2 -->
+
+                        <!-- Step 3: 효과 -->
+                        <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">✨ Step 3. 효과 및 자동화 범위</div>
+                            <div style="background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;">
+                                <div class="option-row"><span class="option-label" style="font-size: 12px;">트랜지션</span><label class="toggle"><input type="checkbox" id="tkTransition" checked><span class="slider"></span></label></div>
+                                <div class="option-row"><span class="option-label" style="font-size: 12px;">자막</span><label class="toggle"><input type="checkbox" id="tkSubtitle" checked><span class="slider"></span></label></div>
+                                <div class="option-row"><span class="option-label" style="font-size: 12px;">무음 삭제</span><label class="toggle"><input type="checkbox" id="tkSilence"><span class="slider"></span></label></div>
+                                <div class="option-row" style="border-bottom: none;"><span class="option-label" style="font-size: 12px; color: #555;" id="tkKeepAudioLabel">영상 효과음 보존</span><label class="toggle"><input type="checkbox" id="tkKeepAudio" disabled><span class="slider"></span></label></div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">효과음</div>
+                                    <select id="tkSfx" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                        <option value="none" selected>없음</option>
+                                        <option value="pc_default">PC 설정값 사용</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">배경음</div>
+                                    <select id="tkBgm" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                        <option value="none" selected>없음</option>
+                                        <option value="pc_default">PC 설정값 사용</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">이미지 효과</div>
+                                    <select id="tkImgEffect" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                        <option value="none">🚫 없음</option><option value="auto" selected>✨ 자동</option><option value="kenburns">🔍 Ken Burns</option><option value="panning">↔️ 패닝</option><option value="floating">☁️ 플로팅</option><option value="complex">🎥 복합 모션</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">영상 효과</div>
+                                    <select id="tkVidEffect" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                        <option value="none" selected>🚫 없음</option><option value="auto">✨ 자동</option><option value="kenburns">🔍 Ken Burns</option><option value="panning">↔️ 패닝</option><option value="floating">☁️ 플로팅</option><option value="complex">🎥 복합 모션</option><option value="mirror">🪞 미러링</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 14px;">
+                                <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">자동화 범위</div>
+                                <select id="tkScope" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
+                                    <option value="images">1단계: 장면 분할 및 이미지 생성까지</option>
+                                    <option value="audio">2단계: AI 음성 생성까지</option>
+                                    <option value="preview">3단계: 미리보기 영상까지</option>
+                                    <option value="export" selected>4단계: 최종 MP4 내보내기</option>
+                                </select>
+                            </div>
+                        </div><!-- /Step 3 -->
+
+                        <!-- 하단 버튼 -->
+                        <div class="tab-bottom-btns" style="margin-top: 12px;">
+                            <button onclick="startTtalkkak()" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer;">🚀 딸깍 시작!</button>
+                            <button class="btn-next" onclick="switchTab(1)" style="flex: 1;">다음 →</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ═══ 탭 1: 대본 ═══ -->
@@ -1226,7 +1432,7 @@
 
                     <!-- 하단 버튼 -->
                     <div class="tab-bottom-btns">
-                        <button class="btn-execute" onclick="openTtalkkakModal()" style="flex: 1;">⚡ 딸깍 실행</button>
+                        <button class="btn-prev" onclick="switchTab(0)" style="flex: 1;">← ⚡ 딸깍</button>
                         <button class="btn-next" onclick="switchTab(2)" style="flex: 1;">다음 →</button>
                     </div>
                     </div><!-- /tab1Content -->
@@ -1603,210 +1809,6 @@
         </div>
     </div>
 
-    <!-- ═══ 딸깍 모달 ═══ -->
-    <div id="ttalkkakModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: flex-start; padding: 30px 15px; overflow-y: auto;">
-        <div style="background: #1a1c24; border-radius: 16px; max-width: 500px; width: 100%; padding: 24px 18px; border: 1px solid #3a3c3e;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 20px; font-weight: 700; color: #fff;">⚡ 딸깍! 원클릭 자동화</div>
-                <div style="font-size: 12px; color: #888; margin-top: 4px;">설정 후 시작하면 전체 파이프라인이 자동 실행됩니다</div>
-            </div>
-
-            <!-- Step 1: 비주얼 소스 -->
-            <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">🎨 Step 1. 비주얼 소스 연출</div>
-                <div style="margin-bottom: 10px;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">생성 모델</div>
-                    <select id="tkModel" style="width: 100%; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                        <option value="나노바나나2 - 자동" selected>나노바나나2 - 자동</option>
-                        <option value="나노바나나 프로 - 자동">나노바나나 프로 - 자동</option>
-                        <option value="나노바나나 일반 - 자동">나노바나나 일반 - 자동</option>
-                        <option value="이매진 4 Ultra - 자동">이매진 4 Ultra - 자동</option>
-                        <option value="위스크 (Whisk) - 자동">위스크 (Whisk) - 자동</option>
-                        <option value="플로우 (Flow) - 자동">플로우 (Flow) - 자동</option>
-                        <option disabled>────────────</option>
-                        <option value="나노바나나2 - 1:1">나노바나나2 - 1:1</option>
-                        <option value="나노바나나 프로 - 1:1">나노바나나 프로 - 1:1</option>
-                        <option value="나노바나나 일반 - 1:1">나노바나나 일반 - 1:1</option>
-                        <option value="이매진 4 Ultra - 1:1">이매진 4 Ultra - 1:1</option>
-                        <option value="위스크 (Whisk) - 1:1">위스크 (Whisk) - 1:1</option>
-                        <option value="플로우 (Flow) - 1:1">플로우 (Flow) - 1:1</option>
-                    </select>
-                </div>
-                <div style="background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
-                    <div class="option-row"><span class="option-label" style="font-size: 12px;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
-                    <div class="option-row" style="border-bottom: none;"><span class="option-label" style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">스타일</div>
-                        <select id="tkStyle" style="width: 100%; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option>커스텀</option><option>감성 수채화</option><option>실사</option><option>3D 애니메이션</option><option>사이버펑크</option><option>클레이 애니메이션</option><option>미국 코믹북</option><option>연필 스케치</option><option>팝아트</option><option>일본 애니메이션</option><option>픽셀아트</option><option>파스텔 몽환</option><option>종이공예</option><option>유화 명화</option><option>인포그래픽</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">이미지 수</div>
-                        <div style="display: flex; gap: 4px;">
-                            <select id="tkSplit" onchange="onTkSplitChange()" style="flex: 1; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                                <option value="per_sentence">문장 당</option><option value="default">기본(복합)</option><option value="total">전체 수</option>
-                            </select>
-                            <input type="number" id="tkSplitCount" value="1" min="1" max="100" style="width: 42px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 6px; color: #fff; padding: 6px; text-align: center; font-size: 12px;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: AI 음성 -->
-            <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">🎙️ Step 2. AI 음성 및 나레이션</div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="gemini" checked onchange="onTkTtsChange()" style="accent-color: #667eea;"> Gemini</label>
-                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="elevenlabs" onchange="onTkTtsChange()" style="accent-color: #667eea;"> ElevenLabs</label>
-                <label class="radio-label" style="font-size: 12px;"><input type="radio" name="tkTts" value="typecast" onchange="onTkTtsChange()" style="accent-color: #667eea;"> Typecast</label>
-                <span id="tkCredits" style="margin-left: auto; font-size: 11px; color: #888; display: none;">💳 <span id="tkCreditsValue" style="color: #8fa4f0; font-weight: 600;"></span></span>
-            </div>
-            <!-- Gemini 옵션 -->
-            <div id="tkGeminiOpts" style="margin-bottom: 14px;">
-                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">목소리</div>
-                        <select id="tkVoice" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <optgroup label="남성"><option value="Orus">태성</option><option value="Charon">민수</option><option value="Alnilam">승우</option><option value="Puck">지한</option><option value="Algenib">성진</option><option value="Fenrir">현우</option><option value="Iapetus">민혁</option><option value="Umbriel">준호</option><option value="Achird">동혁</option><option value="Enceladus">서준</option></optgroup>
-                            <optgroup label="여성"><option value="Leda">유나</option><option value="Kore" selected>서연</option><option value="Aoede">민지</option><option value="Gacrux">은지</option><option value="Zephyr">소희</option><option value="Callirrhoe">수진</option><option value="Laomedeia">지수</option><option value="Autonoe">소은</option><option value="Achernar">지선</option><option value="Despina">하윤</option></optgroup>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">말투 스타일</div>
-                        <select id="tkTtsStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option>기본</option><option>명랑하게</option><option>차분하게</option><option>강하고 단호하게</option><option>뉴스 리포터처럼</option><option>다정하고 따뜻하게</option><option>진지하고 엄격하게</option><option>속삭이는 듯</option><option>슬프고 애절하게</option><option>신비롭고 몽환적으로</option><option>긴장감 있게</option><option>전문가처럼 박식하게</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: flex-end;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
-                        <select id="tkGeminiSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="0.8">0.8x 느림</option><option value="0.9">0.9x</option><option value="1.0">1.0x 보통</option><option value="1.1" selected>1.1x 기본</option><option value="1.2">1.2x</option><option value="1.3">1.3x 빠름</option><option value="1.5">1.5x</option><option value="2.0">2.0x 최대</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px; padding-bottom: 2px;">
-                        <span style="font-size: 12px; color: #aaa; white-space: nowrap;">500자 분할</span>
-                        <label class="toggle"><input type="checkbox" id="tkGeminiSplit500" checked><span class="slider"></span></label>
-                    </div>
-                </div>
-            </div>
-            <!-- ElevenLabs 옵션 -->
-            <div id="tkElOpts" style="display: none; margin-bottom: 14px;">
-                <div style="margin-bottom: 8px;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">음성 선택</div>
-                    <button id="tkElVoiceBtn" onclick="openTkVoicePicker('elevenlabs')" style="width: 100%; padding: 9px 10px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #8fa4f0; font-size: 12px; cursor: pointer; text-align: left;">목소리 선택</button>
-                </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">모델</div>
-                        <select id="tkElModel" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="eleven_v3">v3 최신</option><option value="eleven_multilingual_v2" selected>다국어 v2</option><option value="eleven_turbo_v2_5">터보 v2.5</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">안정성</div>
-                        <select id="tkElStability" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="0.0">개성/생동감</option><option value="0.5" selected>보통</option><option value="1.0">차분</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
-                        <select id="tkElSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="0.8">느림</option><option value="1.0" selected>보통</option><option value="1.2">빠름</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <!-- Typecast 옵션 -->
-            <div id="tkTcOpts" style="display: none; margin-bottom: 14px;">
-                <div style="margin-bottom: 8px;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">음성 선택</div>
-                    <button id="tkTcVoiceBtn" onclick="openTkVoicePicker('typecast')" style="width: 100%; padding: 9px 10px; background: #0d0e14; border: 1px solid #3a3c3e; border-radius: 8px; color: #8fa4f0; font-size: 12px; cursor: pointer; text-align: left;">목소리 선택</button>
-                </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">감정</div>
-                        <select id="tkTcEmotion" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="normal" selected>🤖 자동</option><option value="happy">😊 기쁨</option><option value="sad">😢 슬픔</option><option value="angry">😠 화남</option><option value="whisper">🤫 속삭임</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">강도</div>
-                        <select id="tkTcIntensity" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="1.0">약하게</option><option value="1.5" selected>보통</option><option value="2.0">강하게</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
-                        <select id="tkTcSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                            <option value="0.8">느림</option><option value="1.0" selected>보통</option><option value="1.2">빠름</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            </div><!-- /Step 2 -->
-
-            <!-- Step 3: 효과 -->
-            <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-size: 13px; color: #667eea; font-weight: 700; margin-bottom: 10px;">✨ Step 3. 효과 및 자동화 범위</div>
-                <div style="background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;">
-                <div class="option-row"><span class="option-label" style="font-size: 12px;">트랜지션</span><label class="toggle"><input type="checkbox" id="tkTransition" checked><span class="slider"></span></label></div>
-                <div class="option-row"><span class="option-label" style="font-size: 12px;">자막</span><label class="toggle"><input type="checkbox" id="tkSubtitle" checked><span class="slider"></span></label></div>
-                <div class="option-row"><span class="option-label" style="font-size: 12px;">무음 삭제</span><label class="toggle"><input type="checkbox" id="tkSilence"><span class="slider"></span></label></div>
-                <div class="option-row" style="border-bottom: none;"><span class="option-label" style="font-size: 12px; color: #555;" id="tkKeepAudioLabel">영상 효과음 보존</span><label class="toggle"><input type="checkbox" id="tkKeepAudio" disabled><span class="slider"></span></label></div>
-            </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <div style="flex: 1;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">효과음</div>
-                    <select id="tkSfx" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                        <option value="none" selected>없음</option>
-                        <option value="pc_default">PC 설정값 사용</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">배경음</div>
-                    <select id="tkBgm" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                        <option value="none" selected>없음</option>
-                        <option value="pc_default">PC 설정값 사용</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <div style="flex: 1;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">이미지 효과</div>
-                    <select id="tkImgEffect" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                        <option value="none">🚫 없음</option><option value="auto" selected>✨ 자동</option><option value="kenburns">🔍 Ken Burns</option><option value="panning">↔️ 패닝</option><option value="floating">☁️ 플로팅</option><option value="complex">🎥 복합 모션</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">영상 효과</div>
-                    <select id="tkVidEffect" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                        <option value="none" selected>🚫 없음</option><option value="auto">✨ 자동</option><option value="kenburns">🔍 Ken Burns</option><option value="panning">↔️ 패닝</option><option value="floating">☁️ 플로팅</option><option value="complex">🎥 복합 모션</option><option value="mirror">🪞 미러링</option>
-                    </select>
-                </div>
-            </div>
-            <div style="margin-bottom: 14px;">
-                <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">자동화 범위</div>
-                <select id="tkScope" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
-                    <option value="images">1단계: 장면 분할 및 이미지 생성까지</option>
-                    <option value="audio">2단계: AI 음성 생성까지</option>
-                    <option value="preview">3단계: 미리보기 영상까지</option>
-                    <option value="export" selected>4단계: 최종 MP4 내보내기</option>
-                </select>
-            </div>
-            </div><!-- /Step 3 -->
-
-            <!-- 버튼 -->
-            <div style="display: flex; gap: 10px; margin-top: 6px;">
-                <button onclick="closeTtalkkakModal()" style="flex: 1; padding: 14px; background: #2a2c34; border: 1px solid #3a3c3e; border-radius: 10px; color: #aaa; font-size: 14px; font-weight: 600; cursor: pointer;">닫기</button>
-                <button onclick="startTtalkkak()" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer;">🚀 딸깍 시작!</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Firebase SDK (인증용) -->
     <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
@@ -2467,8 +2469,9 @@
         function resetRemoteState() {
             // 딸깍 모달 + 진행 패널 닫기
             _ttalkkakRunning = false;
-            const tkModal = document.getElementById('ttalkkakModal');
-            if (tkModal) tkModal.style.display = 'none';
+            // 딸깍 탭이 열려있으면 대본 탭으로 복귀
+            const tab0 = document.getElementById('tab0');
+            if (tab0 && tab0.classList.contains('active')) switchTab(1);
             const ppOverlay = document.getElementById('progressPanelOverlay');
             if (ppOverlay) ppOverlay.style.display = 'none';
             // 범용 로딩 오버레이도 닫기 + 타이머 정리
@@ -3812,13 +3815,13 @@
         }
 
         function openTtalkkakModal() {
-            document.getElementById('ttalkkakModal').style.display = 'flex';
+            switchTab(0);
             // 대본탭의 롱폼/쇼츠 상태를 읽어서 이미지 수 옵션 갱신
             updateTkSplitForFormat();
         }
 
         function closeTtalkkakModal() {
-            document.getElementById('ttalkkakModal').style.display = 'none';
+            switchTab(1);
         }
 
         async function startTtalkkak() {
