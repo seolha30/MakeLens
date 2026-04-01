@@ -2336,6 +2336,11 @@
                         const isTtalkkak = status.scenes && !status.overall;
                         if (isTtalkkak) {
                             showProgressPanel();
+                            // 동영상 생성 단계가 Firebase에 있으면 바로 표시
+                            if (status.videos) {
+                                const videosEl = document.getElementById('step-videos');
+                                if (videosEl) videosEl.style.display = '';
+                            }
                             listenProgress();
                         } else if (status.state === 'running') {
                             showLoadingOverlay(status.message || '작업 진행 중...', status.start_time || 0);
