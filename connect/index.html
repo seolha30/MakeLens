@@ -4001,6 +4001,7 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             const tabEl = document.getElementById(`tab${n}`);
             if (tabEl) tabEl.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ═══════════════════════════════════════
