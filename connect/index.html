@@ -2338,7 +2338,11 @@
                             showProgressPanel();
                             // 이미 있는 Firebase status로 단계 상태 즉시 복원
                             const iconMap = { waiting: '⏳', running: '🔄', done: '✅', error: '❌', success: '✅' };
-                            ['scenes', 'videos', 'audio', 'preview', 'export'].forEach(step => {
+                            const hasVideoStep = !!status.videos;
+                            const restoreSteps = hasVideoStep ? ['scenes', 'videos', 'audio', 'preview', 'export'] : ['scenes', 'audio', 'preview', 'export'];
+                            let doneCount = 0;
+                            let hasRunning = false;
+                            restoreSteps.forEach(step => {
                                 if (!status[step]) return;
                                 const el = document.getElementById(`step-${step}`);
                                 if (!el) return;
@@ -2348,7 +2352,14 @@
                                 el.querySelector('.step-icon').textContent = iconMap[st] || '⏳';
                                 const detail = document.getElementById(`step-${step}-detail`);
                                 if (detail && status[step].detail) detail.textContent = status[step].detail;
+                                if (st === 'done' || st === 'success') doneCount++;
+                                if (st === 'running') hasRunning = true;
                             });
+                            // 진행률 바 복원
+                            let pct = Math.round(doneCount / restoreSteps.length * 100);
+                            if (hasRunning && pct < 100) pct += Math.round(25 / 2);
+                            document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
+                            // 메시지 복원
                             if (status.message) {
                                 document.getElementById('progressText').textContent = status.message;
                             }
@@ -3122,11 +3133,11 @@
 
                 // 각 단계별 상태 업데이트
                 const stepMap = {
-                    scenes: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
-                    videos: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
-                    audio: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
-                    preview: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
-                    export: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } }
+                    scenes: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } },
+                    videos: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } },
+                    audio: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } },
+                    preview: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } },
+                    export: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } }
                 };
 
                 // videos 단계가 Firebase에 나타나면 표시
@@ -3157,7 +3168,7 @@
                 let doneCount = 0;
                 let hasRunning = false;
                 allSteps.forEach(s => {
-                    if (status[s] && status[s].state === 'done') doneCount++;
+                    if (status[s] && (status[s].state === 'done' || status[s].state === 'success')) doneCount++;
                     if (status[s] && status[s].state === 'running') hasRunning = true;
                 });
                 let pct = Math.round(doneCount / allSteps.length * 100);
