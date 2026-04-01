@@ -2336,10 +2336,21 @@
                         const isTtalkkak = status.scenes && !status.overall;
                         if (isTtalkkak) {
                             showProgressPanel();
-                            // 동영상 생성 단계가 Firebase에 있으면 바로 표시
-                            if (status.videos) {
-                                const videosEl = document.getElementById('step-videos');
-                                if (videosEl) videosEl.style.display = '';
+                            // 이미 있는 Firebase status로 단계 상태 즉시 복원
+                            const iconMap = { waiting: '⏳', running: '🔄', done: '✅', error: '❌', success: '✅' };
+                            ['scenes', 'videos', 'audio', 'preview', 'export'].forEach(step => {
+                                if (!status[step]) return;
+                                const el = document.getElementById(`step-${step}`);
+                                if (!el) return;
+                                if (step === 'videos') el.style.display = '';
+                                const st = status[step].state || 'waiting';
+                                el.className = `step-item ${st}`;
+                                el.querySelector('.step-icon').textContent = iconMap[st] || '⏳';
+                                const detail = document.getElementById(`step-${step}-detail`);
+                                if (detail && status[step].detail) detail.textContent = status[step].detail;
+                            });
+                            if (status.message) {
+                                document.getElementById('progressText').textContent = status.message;
                             }
                             listenProgress();
                         } else if (status.state === 'running') {
