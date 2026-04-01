@@ -4005,6 +4005,9 @@
             const tabEl = document.getElementById(`tab${n}`);
             if (tabEl) tabEl.classList.add('active');
             window.scrollTo(0, 0);
+            // iframe인 경우 부모 페이지도 스크롤
+            try { window.parent.scrollTo(0, 0); } catch(e) {}
+            try { window.parent.postMessage({ type: 'scrollToTop' }, '*'); } catch(e) {}
         }
 
         // ═══════════════════════════════════════
