@@ -1784,6 +1784,13 @@
                         <div class="step-detail" id="step-scenes-detail"></div>
                     </div>
                 </div>
+                <div class="step-item waiting" id="step-videos" style="display:none;">
+                    <span class="step-icon">⏳</span>
+                    <div>
+                        <div>Grok 동영상 생성</div>
+                        <div class="step-detail" id="step-videos-detail"></div>
+                    </div>
+                </div>
                 <div class="step-item waiting" id="step-audio">
                     <span class="step-icon">⏳</span>
                     <div>
@@ -3071,13 +3078,17 @@
             panel.classList.add('show');
 
             // 단계 초기화
-            ['scenes', 'audio', 'preview', 'export'].forEach(step => {
+            ['scenes', 'videos', 'audio', 'preview', 'export'].forEach(step => {
                 const el = document.getElementById(`step-${step}`);
+                if (!el) return;
                 el.className = 'step-item waiting';
                 el.querySelector('.step-icon').textContent = '⏳';
                 const detail = document.getElementById(`step-${step}-detail`);
                 if (detail) detail.textContent = '';
             });
+            // 동영상 단계는 기본 숨김 (Firebase에서 videos 상태 오면 자동 표시)
+            const videosStep = document.getElementById('step-videos');
+            if (videosStep) videosStep.style.display = 'none';
 
             document.getElementById('progressBar').style.width = '0%';
             document.getElementById('progressText').textContent = '명령 전송 완료, PC 응답 대기 중...';
@@ -3096,15 +3107,23 @@
                 // 각 단계별 상태 업데이트
                 const stepMap = {
                     scenes: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
+                    videos: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
                     audio: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
                     preview: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } },
                     export: { icon: { waiting: '⏳', running: '🔄', done: '✅', error: '❌' } }
                 };
 
+                // videos 단계가 Firebase에 나타나면 표시
+                const videosEl = document.getElementById('step-videos');
+                if (status.videos && videosEl) {
+                    videosEl.style.display = '';
+                }
+
                 Object.keys(stepMap).forEach(step => {
                     if (status[step]) {
                         const stepStatus = status[step].state || 'waiting';
                         const el = document.getElementById(`step-${step}`);
+                        if (!el) return;
                         el.className = `step-item ${stepStatus}`;
                         el.querySelector('.step-icon').textContent = stepMap[step].icon[stepStatus] || '⏳';
 
@@ -3116,7 +3135,9 @@
                 });
 
                 // 전체 진행률: 완료된 단계 수 기반으로 자동 계산 (Firebase 추가 전송 없이)
-                const allSteps = ['scenes', 'audio', 'preview', 'export'];
+                // videos 단계가 있으면 5단계, 없으면 4단계
+                const hasVideoStep = status.videos ? true : false;
+                const allSteps = hasVideoStep ? ['scenes', 'videos', 'audio', 'preview', 'export'] : ['scenes', 'audio', 'preview', 'export'];
                 let doneCount = 0;
                 let hasRunning = false;
                 allSteps.forEach(s => {
