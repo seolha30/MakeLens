@@ -2809,24 +2809,11 @@
                             </div>`;
                             const imgBorder = s.has_video ? 'border:2px solid #10B981; padding:3px;' : '';
 
-                            if (s.thumbnail_url && isPortrait) {
-                                // 세로(쇼츠): 나레이션 위, 프롬프트+이미지 나란히
-                                return `<div style="background:#12131a; border:1px solid #3a3c3e; border-radius:10px; padding:12px; margin-bottom:8px;">
-                                    <div style="font-size:11px; color:#2D7FF9; font-weight:700; margin-bottom:6px;">장면 #${sNo}</div>
-                                    <div style="font-size:13px; color:#ddd; line-height:1.5; margin-bottom:8px;">${esc(s.narration)}</div>
-                                    <div style="display:flex; gap:10px;">
-                                        <div style="flex:1; min-width:0;">
-                                            ${s.image_prompt ? `<div style="font-size:11px; color:#7aa2f7; border-top:1px solid #2a2c3e; padding-top:6px;">🖼 ${esc(s.image_prompt)}</div>` : ''}
-                                            ${s.video_prompt ? `<div style="font-size:11px; color:#9ece6a; border-top:1px solid #2a2c3e; padding-top:6px; margin-top:6px;">🎬 ${esc(s.video_prompt)}</div>` : ''}
-                                        </div>
-                                        <img src="${s.thumbnail_url}" onclick="showImagePreview('${s.thumbnail_url}')" style="width:140px; min-width:140px; border-radius:8px; cursor:pointer; align-self:flex-start; ${imgBorder}" onerror="this.style.display='none'">
-                                    </div>
-                                    ${regenBtns}
-                                </div>`;
-                            } else {
-                                // 가로/1:1/이미지없음: 상단 배치
+                            {
+                                // 모든 형식(쇼츠/롱폼/1:1): 이미지 상단 배치
+                                const imgMaxHeight = isPortrait ? '300px' : '200px';
                                 return `<div style="background:#12131a; border:1px solid #3a3c3e; border-radius:10px; overflow:hidden; margin-bottom:8px;">
-                                    ${s.thumbnail_url ? `<div style="background:#000; text-align:center;" onclick="showImagePreview('${s.thumbnail_url}')"><img src="${s.thumbnail_url}" style="max-width:100%; max-height:200px; object-fit:contain; cursor:pointer; display:block; margin:0 auto; ${imgBorder} border-radius:4px;" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                                    ${s.thumbnail_url ? `<div style="background:#000; text-align:center;" onclick="showImagePreview('${s.thumbnail_url}')"><img src="${s.thumbnail_url}" style="max-width:100%; max-height:${imgMaxHeight}; object-fit:contain; cursor:pointer; display:block; margin:0 auto; ${imgBorder} border-radius:4px;" onerror="this.parentElement.style.display='none'"></div>` : ''}
                                     <div style="padding:12px;">
                                         <div style="font-size:11px; color:#2D7FF9; font-weight:700; margin-bottom:6px;">장면 #${sNo}</div>
                                         <div style="font-size:13px; color:#ddd; line-height:1.5;">${esc(s.narration)}</div>
