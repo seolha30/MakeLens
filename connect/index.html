@@ -3019,7 +3019,12 @@
                 if (elFirst.speed !== undefined) setSelectByValue(document.getElementById('tkElSpeed'), String(elFirst.speed));
                 if (elFirst.voice_name) {
                     const btn = document.getElementById('tkElVoiceBtn');
-                    if (btn) btn.textContent = elFirst.voice_name;
+                    if (btn) {
+                        const kr = translateElName(elFirst.voice_name);
+                        const _cat_kr = {premade:'기본', professional:'Pro', cloned:'복제'};
+                        const cat = _cat_kr[elFirst.category] || '';
+                        btn.textContent = cat ? `${kr} (${cat})` : kr;
+                    }
                 }
                 const tcS = data.typecast_speaker_settings || {};
                 const tcFirst = tcS[Object.keys(tcS)[0]] || {};
@@ -3028,7 +3033,16 @@
                 if (tcFirst.tempo !== undefined) setSelectByValue(document.getElementById('tkTcSpeed'), String(tcFirst.tempo));
                 if (tcFirst.voice_name) {
                     const btn = document.getElementById('tkTcVoiceBtn');
-                    if (btn) btn.textContent = tcFirst.voice_name;
+                    if (btn) {
+                        const _tc_age_kr = {child:'아이',teenager:'청소년',young_adult:'청년',middle_age:'중년',elder:'노년'};
+                        const _tc_gender_kr = {male:'남성',female:'여성'};
+                        const _tc_uc_kr = {Conversational:'대화체','Radio/Podcast':'라디오',Game:'게임',Anime:'애니메이션','News Reporter':'뉴스',Announcer:'아나운서',Documentary:'다큐멘터리','E-learning/Explainer':'교육','Audiobook/Storytelling':'오디오북','Ads/Promotion':'광고','TikTok/Reels/Shorts':'숏츠',Narrator:'내레이터',Character:'캐릭터'};
+                        const aStr = _tc_age_kr[tcFirst.age] || '';
+                        const gStr = _tc_gender_kr[tcFirst.gender] || '';
+                        const ucs = (tcFirst.use_cases || []).slice(0,2).map(u => _tc_uc_kr[u] || u).join(', ');
+                        const info = [aStr+gStr, ucs].filter(x=>x).join(' · ');
+                        btn.textContent = info ? `${tcFirst.voice_name} (${info})` : tcFirst.voice_name;
+                    }
                 }
                 updateVideoSourceAvailability();
 
