@@ -2778,6 +2778,7 @@
             try {
                 const data = await firebaseGet(`remote/${selectedComputerId}/project_data/${projectKey}`);
                 if (!data) return;
+                window.window._currentProjectData = data;
 
                 // ── 탭1: 대본 ──
                 // 벤치/일반
@@ -3935,20 +3936,35 @@
                 command.options.el_model = document.getElementById('tkElModel').value;
                 command.options.el_stability = parseFloat(document.getElementById('tkElStability').value);
                 command.options.el_speed = parseFloat(document.getElementById('tkElSpeed').value);
-                // 딸깍에서 선택한 목소리 (없으면 PC 기존값 사용)
+                // 딸깍에서 선택한 목소리 우선, 없으면 PC 동기화 데이터에서 가져오기
                 if (_tkSelectedVoice.elevenlabs) {
                     command.options.el_voice_id = _tkSelectedVoice.elevenlabs.voice_id;
                     command.options.el_voice_name = _tkSelectedVoice.elevenlabs.voice_name;
+                } else if (window._currentProjectData && window._currentProjectData.elevenlabs_speaker_settings) {
+                    const elS = window._currentProjectData.elevenlabs_speaker_settings;
+                    const elFirst = elS[Object.keys(elS)[0]];
+                    if (elFirst) {
+                        command.options.el_voice_id = elFirst.voice_id || '';
+                        command.options.el_voice_name = elFirst.voice_name || '';
+                    }
                 }
             } else if (tkProvider === 'typecast') {
                 command.options.tc_emotion = document.getElementById('tkTcEmotion').value;
                 command.options.tc_intensity = parseFloat(document.getElementById('tkTcIntensity').value);
                 command.options.tc_speed = parseFloat(document.getElementById('tkTcSpeed').value);
-                // 딸깍에서 선택한 목소리 (없으면 PC 기존값 사용)
+                // 딸깍에서 선택한 목소리 우선, 없으면 PC 동기화 데이터에서 가져오기
                 if (_tkSelectedVoice.typecast) {
                     command.options.tc_voice_id = _tkSelectedVoice.typecast.voice_id;
                     command.options.tc_voice_name = _tkSelectedVoice.typecast.voice_name;
                     command.options.tc_best_model = _tkSelectedVoice.typecast.best_model;
+                } else if (window._currentProjectData && window._currentProjectData.typecast_speaker_settings) {
+                    const tcS = window._currentProjectData.typecast_speaker_settings;
+                    const tcFirst = tcS[Object.keys(tcS)[0]];
+                    if (tcFirst) {
+                        command.options.tc_voice_id = tcFirst.voice_id || '';
+                        command.options.tc_voice_name = tcFirst.voice_name || '';
+                        command.options.tc_best_model = tcFirst.best_model || tcFirst.model || '';
+                    }
                 }
             }
 
