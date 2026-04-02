@@ -1644,13 +1644,19 @@
 
                     <!-- ═══ ElevenLabs 설정 ═══ -->
                     <div id="ttsElevenlabs" class="tts-panel" style="display: none;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 10px;">🎭 화자별 설정</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600;">🎭 화자별 설정</div>
+                            <span id="elCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="elCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                        </div>
                         <div id="elSpeakerTable"></div>
                     </div>
 
                     <!-- ═══ Typecast 설정 ═══ -->
                     <div id="ttsTypecast" class="tts-panel" style="display: none;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 10px;">🎭 화자별 설정</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600;">🎭 화자별 설정</div>
+                            <span id="tcCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="tcCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                        </div>
                         <div id="tcSpeakerTable"></div>
                     </div>
 
@@ -2958,9 +2964,17 @@
                     });
                     dummySpeakersAll = { el: elSpeakers, tc: tcSpeakers };
                 }
-                // 크레딧 정보 저장
-                if (data.el_credits) window._elCredits = data.el_credits;
-                if (data.tc_credits) window._tcCredits = data.tc_credits;
+                // 크레딧 정보 저장 + 음성탭 표시
+                if (data.el_credits) {
+                    window._elCredits = data.el_credits;
+                    const elVal = document.getElementById('elCreditsValue');
+                    if (elVal) elVal.textContent = data.el_credits.remaining.toLocaleString();
+                }
+                if (data.tc_credits) {
+                    window._tcCredits = data.tc_credits;
+                    const tcVal = document.getElementById('tcCreditsValue');
+                    if (tcVal) tcVal.textContent = data.tc_credits.remaining.toLocaleString();
+                }
                 // 3) 화자모드 토글 설정
                 const speakerToggle = document.getElementById('speakerModeToggle');
                 if (speakerToggle) speakerToggle.checked = !!data.speaker_mode_active;
