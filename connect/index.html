@@ -1077,6 +1077,10 @@
                     <label>이메일 주소</label>
                     <input type="email" id="loginEmail" placeholder="메이크렌즈에 등록한 이메일">
                 </div>
+                <div class="input-group">
+                    <label>전화번호 뒷 4자리</label>
+                    <input type="tel" id="loginPhone" placeholder="예: 1234" maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
+                </div>
                 <div class="remember-row">
                     <input type="checkbox" id="rememberEmail" checked>
                     <span>이메일 기억하기</span>
@@ -2009,12 +2013,19 @@
         }
 
         // ═══════════════════════════════════════
-        // 로그인 (이메일로 Firebase 조회)
+        // 로그인 (앱스크립트로 검증 → Firebase 조회)
         // ═══════════════════════════════════════
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaj-lgc71_2P0AsrRVED6-pfcC2djwgkr0G0Idbkt9U2hRHiJSR_zxkn67nfIE0BA/exec';
+
         async function doLogin() {
             const email = document.getElementById('loginEmail').value.trim();
+            const phone = document.getElementById('loginPhone').value.trim();
             if (!email) {
                 showAlert('이메일을 입력해주세요', 'warning');
+                return;
+            }
+            if (!phone || phone.length !== 4 || !/^\d{4}$/.test(phone)) {
+                showAlert('전화번호 뒷 4자리를 입력해주세요', 'warning');
                 return;
             }
 
@@ -2030,17 +2041,30 @@
                     await new Promise(r => setTimeout(r, 600)); // 로딩 느낌
                     nodes = DUMMY_NODES.map(n => ({ ...n, 이메일: email }));
                 } else {
-                    // 실제 모드: Firebase REST API 조회
-                    const data = await firebaseGet('라이센스');
+                    // 1단계: 앱스크립트로 이메일 + 전화번호 검증
+                    const params = new URLSearchParams({ action: 'verify_login', email, phone });
+                    const verifyRes = await fetch(`${APPS_SCRIPT_URL}?${params}`);
+                    const verifyData = await verifyRes.json();
 
-                    if (!data) {
-                        showAlert('등록된 이메일이 없습니다', 'error');
+                    if (!verifyData.success) {
+                        showAlert(verifyData.message || '이메일 또는 전화번호가 일치하지 않습니다', 'error');
+                        return;
+                    }
+
+                    // 2단계: Firebase에서 내 이메일 라이센스만 가져오기
+                    const token = await getAuthToken();
+                    const queryUrl = `${FIREBASE_DB_URL}/${encodeURIComponent('라이센스')}.json?auth=${token}&orderBy="${encodeURIComponent('이메일')}"&equalTo="${encodeURIComponent(email)}"`;
+                    const res = await fetch(queryUrl);
+                    const data = res.ok ? await res.json() : null;
+
+                    if (!data || Object.keys(data).length === 0) {
+                        showAlert('등록된 라이센스가 없습니다', 'error');
                         return;
                     }
 
                     const today = new Date().toISOString().split('T')[0];
                     Object.entries(data).forEach(([key, val]) => {
-                        if (val.이메일 === email && val.활성화상태 === '사용중' && val.만료여부 === '정상') {
+                        if (val.활성화상태 === '사용중' && val.만료여부 === '정상') {
                             if (val.만료일 && val.만료일 < today) {
                                 return; // 만료일 지남
                             }
