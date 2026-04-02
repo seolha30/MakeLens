@@ -2992,7 +2992,7 @@
                 }
                 // 딸깍 모달: 탭4 옵션 동기화
                 setCheck('tkVideoGen', data.video_generation);
-                setCheck('tkBoomerang', false);
+                setCheck('tkBoomerang', !!data.boomerang_mode);
                 setSelectByValue(document.getElementById('tkImgEffect'), EFFECT_MAP[data.image_effect] || 'none');
                 setSelectByValue(document.getElementById('tkVidEffect'), EFFECT_MAP[data.video_effect] || 'none');
                 setCheck('tkSubtitle', data.subtitle_visible !== false);
