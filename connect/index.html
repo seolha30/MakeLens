@@ -3899,10 +3899,10 @@
             const creditsVal = document.getElementById('tkCreditsValue');
             if (val === 'elevenlabs' && window._elCredits) {
                 credits.style.display = '';
-                creditsVal.textContent = `${window._elCredits.remaining.toLocaleString()} / ${window._elCredits.limit.toLocaleString()}`;
+                creditsVal.textContent = `${window._elCredits.remaining.toLocaleString()}`;
             } else if (val === 'typecast' && window._tcCredits) {
                 credits.style.display = '';
-                creditsVal.textContent = `${window._tcCredits.remaining.toLocaleString()} / ${window._tcCredits.total.toLocaleString()}`;
+                creditsVal.textContent = `${window._tcCredits.remaining.toLocaleString()}`;
             } else {
                 credits.style.display = 'none';
             }
