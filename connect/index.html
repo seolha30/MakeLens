@@ -2778,7 +2778,7 @@
             try {
                 const data = await firebaseGet(`remote/${selectedComputerId}/project_data/${projectKey}`);
                 if (!data) return;
-                window.window._currentProjectData = data;
+                window._currentProjectData = data;
 
                 // ── 탭1: 대본 ──
                 // 벤치/일반
