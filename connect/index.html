@@ -1079,7 +1079,7 @@
                 </div>
                 <div class="input-group">
                     <label>전화번호 뒷 4자리</label>
-                    <input type="tel" id="loginPhone" placeholder="예: 1234" maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
+                    <input type="password" id="loginPhone" placeholder="예: 1234" maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
                 </div>
                 <div class="remember-row">
                     <input type="checkbox" id="rememberEmail" checked>
@@ -1128,7 +1128,6 @@
 
                 <!-- ═══ 탭 네비게이션 ═══ -->
                 <div class="tab-nav" id="tabNav" style="display: none;">
-                    <div class="tab-item" data-tab="0" onclick="switchTab(0)">⚡ 딸깍</div>
                     <div class="tab-item active" data-tab="1" onclick="switchTab(1)">1. 대본</div>
                     <div class="tab-item" data-tab="2" onclick="switchTab(2)">2. 장면/이미지</div>
                     <div class="tab-item" data-tab="3" onclick="switchTab(3)">3. 음성</div>
@@ -1334,7 +1333,7 @@
 
                         <!-- 하단 버튼 -->
                         <div class="tab-bottom-btns" style="margin-top: 12px;">
-                            <button onclick="startTtalkkak()" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer;">🚀 딸깍 시작!</button>
+                            <button onclick="startTtalkkak()" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #ff6b35, #f7971e); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer;">💥 딸깍 시작!</button>
                             <button class="btn-next" onclick="switchTab(1)" style="flex: 1;">다음 →</button>
                         </div>
                     </div>
@@ -1351,42 +1350,45 @@
 
                     <!-- 프로젝트 선택 후 표시되는 영역 -->
                     <div id="tab1Content" style="display: none;">
-                    <!-- 대본 유형: 벤치/일반 │ 롱폼/쇼츠+길이 -->
-                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; margin-bottom: 12px; font-size: 12px;">
-                        <!-- 벤치 / 일반 -->
-                        <div class="radio-group" style="gap: 8px;">
-                            <label class="radio-label" style="font-size: 12px; gap: 4px;">
-                                <input type="radio" name="scriptType" value="bench" checked onchange="onScriptTypeChange()" style="width: 14px; height: 14px;">
-                                <span>벤치</span>
-                            </label>
-                            <label class="radio-label" style="font-size: 12px; gap: 4px;">
-                                <input type="radio" name="scriptType" value="normal" onchange="onScriptTypeChange()" style="width: 14px; height: 14px;">
-                                <span>일반</span>
-                            </label>
+                    <!-- 대본 유형: 벤치/일반 + 롱폼/쇼츠+길이 (2줄) -->
+                    <div style="padding: 10px 12px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; margin-bottom: 12px; font-size: 12px;">
+                        <!-- 1줄: 벤치 / 일반 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <div class="radio-group" style="gap: 8px;">
+                                <label class="radio-label" style="font-size: 12px; gap: 4px;">
+                                    <input type="radio" name="scriptType" value="bench" checked onchange="onScriptTypeChange()" style="width: 14px; height: 14px;">
+                                    <span>벤치</span>
+                                </label>
+                                <label class="radio-label" style="font-size: 12px; gap: 4px;">
+                                    <input type="radio" name="scriptType" value="normal" onchange="onScriptTypeChange()" style="width: 14px; height: 14px;">
+                                    <span>일반</span>
+                                </label>
+                            </div>
                         </div>
-                        <span style="color: #3a3c3e; font-size: 16px;">│</span>
-                        <!-- 롱폼 / 쇼츠 + 길이 (한 덩어리) -->
-                        <div class="radio-group" style="gap: 8px;">
-                            <label class="radio-label" style="font-size: 12px; gap: 4px;">
-                                <input type="radio" name="scriptFormat" value="longform" onchange="onFormatChange()" style="width: 14px; height: 14px;">
-                                <span>롱폼</span>
-                            </label>
-                            <label class="radio-label" style="font-size: 12px; gap: 4px;">
-                                <input type="radio" name="scriptFormat" value="shorts" checked onchange="onFormatChange()" style="width: 14px; height: 14px;">
-                                <span>쇼츠</span>
-                            </label>
-                        </div>
-                        <!-- 쇼츠 길이 -->
-                        <div id="shortsLengthBox" style="display: flex; align-items: center; gap: 3px; color: #888;">
-                            <input type="number" id="shortsLength" value="30" min="10" max="180" oninput="updateCharEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
-                            <span>초</span>
-                            <span id="charEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 360자)</span>
-                        </div>
-                        <!-- 롱폼 길이 -->
-                        <div id="longformLengthBox" style="display: none; align-items: center; gap: 3px; color: #888;">
-                            <input type="number" id="longformLength" value="1" min="1" max="60" oninput="updateLongformEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
-                            <span>분</span>
-                            <span id="longformEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 720자)</span>
+                        <!-- 2줄: 롱폼 / 쇼츠 + 길이 -->
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="radio-group" style="gap: 8px;">
+                                <label class="radio-label" style="font-size: 12px; gap: 4px;">
+                                    <input type="radio" name="scriptFormat" value="longform" onchange="onFormatChange()" style="width: 14px; height: 14px;">
+                                    <span>롱폼</span>
+                                </label>
+                                <label class="radio-label" style="font-size: 12px; gap: 4px;">
+                                    <input type="radio" name="scriptFormat" value="shorts" checked onchange="onFormatChange()" style="width: 14px; height: 14px;">
+                                    <span>쇼츠</span>
+                                </label>
+                            </div>
+                            <!-- 쇼츠 길이 -->
+                            <div id="shortsLengthBox" style="display: flex; align-items: center; gap: 3px; color: #888;">
+                                <input type="number" id="shortsLength" value="30" min="10" max="180" oninput="updateCharEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
+                                <span>초</span>
+                                <span id="charEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 360자)</span>
+                            </div>
+                            <!-- 롱폼 길이 -->
+                            <div id="longformLengthBox" style="display: none; align-items: center; gap: 3px; color: #888;">
+                                <input type="number" id="longformLength" value="1" min="1" max="60" oninput="updateLongformEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
+                                <span>분</span>
+                                <span id="longformEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 720자)</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1441,7 +1443,7 @@
 
                     <!-- 하단 버튼 -->
                     <div class="tab-bottom-btns">
-                        <button class="btn-prev" onclick="switchTab(0)" style="flex: 1;">← ⚡ 딸깍</button>
+                        <button class="btn-prev" onclick="switchTab(0)" style="flex: 1; background: linear-gradient(135deg, #ff6b35, #f7971e); border: none; color: #fff; font-weight: 700;">💥 딸깍!</button>
                         <button class="btn-next" onclick="switchTab(2)" style="flex: 1;">다음 →</button>
                     </div>
                     </div><!-- /tab1Content -->
