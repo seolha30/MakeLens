@@ -2111,25 +2111,39 @@
         // ═══════════════════════════════════════
         // PC 선택 화면
         // ═══════════════════════════════════════
-        function renderPcList(nodes) {
+        async function renderPcList(nodes) {
             const container = document.getElementById('pcList');
+            // 먼저 로딩 상태로 그리기
             container.innerHTML = nodes.map((node, i) => {
-                const isOnline = node.온라인 === true;
-                const statusClass = isOnline ? 'online' : 'offline';
-                const statusText = isOnline ? '온라인' : '오프라인';
                 const name = node.사용자정보 || `PC ${i + 1}`;
                 const plan = node.타입 || '알 수 없음';
-
                 return `
                     <div class="pc-item" onclick="choosePc(${i}, this)" data-index="${i}">
-                        <div class="pc-status ${statusClass}"></div>
+                        <div class="pc-status offline" id="pcStatus_${i}"></div>
                         <div class="pc-info">
                             <div class="pc-name">${name}</div>
-                            <div class="pc-detail">${statusText} · ${plan}</div>
+                            <div class="pc-detail" id="pcDetail_${i}">확인 중... · ${plan}</div>
                         </div>
                     </div>
                 `;
             }).join('');
+            // Firebase remote/{컴퓨터ID}/online 값 읽어서 상태 업데이트
+            for (let i = 0; i < nodes.length; i++) {
+                const cid = nodes[i].컴퓨터ID;
+                const plan = nodes[i].타입 || '알 수 없음';
+                if (!cid) continue;
+                try {
+                    const val = await firebaseGet(`remote/${cid}/online`);
+                    const isOnline = val === true;
+                    nodes[i].온라인 = isOnline;
+                    const statusEl = document.getElementById(`pcStatus_${i}`);
+                    const detailEl = document.getElementById(`pcDetail_${i}`);
+                    if (statusEl) statusEl.className = `pc-status ${isOnline ? 'online' : 'offline'}`;
+                    if (detailEl) detailEl.textContent = `${isOnline ? '온라인' : '오프라인'} · ${plan}`;
+                } catch (e) {
+                    console.error(`[PC ${i}] 온라인 상태 확인 실패`, e);
+                }
+            }
         }
 
         let tempPcIndex = null;
