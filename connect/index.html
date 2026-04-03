@@ -741,6 +741,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            text-align: center;
         }
 
         .btn-next:hover {
@@ -1801,6 +1802,7 @@
 
                     <div class="tab-bottom-btns">
                         <button class="btn-prev" onclick="switchTab(3)">← 이전</button>
+                        <button class="btn-next" onclick="openTtalkkakModal()" style="background: linear-gradient(135deg, #ff6b35, #f7971e); color: white;">⚡ 딸깍</button>
                     </div>
                 </div>
 
@@ -4800,11 +4802,61 @@
         }
 
         // ═══════════════════════════════════════
+        // ═══════════════════════════════════════
+        // 딸깍 ↔ 각 탭 양방향 미러링
+        // ═══════════════════════════════════════
+        const MIRROR_PAIRS = [
+            // 탭2: 장면/이미지
+            { tk: 'tkModel', tab: 'optImageModel', type: 'select' },
+            { tk: 'tkStyle', tab: 'optStyle', type: 'select' },
+            { tk: 'tkSplit', tab: 'optSplitMethod', type: 'select' },
+            { tk: 'tkSplitCount', tab: 'optSplitCount', type: 'input' },
+            // 탭3: 음성 (Gemini)
+            { tk: 'tkVoice', tab: 'geminiVoice', type: 'select' },
+            { tk: 'tkTtsStyle', tab: 'geminiStyle', type: 'select' },
+            { tk: 'tkGeminiSpeed', tab: 'geminiSpeed', type: 'select' },
+            { tk: 'tkGeminiSplit500', tab: 'geminiSplit500', type: 'checkbox' },
+            // 탭4: 최종영상
+            { tk: 'tkTransition', tab: 'optTransition', type: 'checkbox' },
+            { tk: 'tkSubtitle', tab: 'optSubtitleOn', type: 'checkbox' },
+            { tk: 'tkSilence', tab: 'optSilenceRemove', type: 'checkbox' },
+            { tk: 'tkKeepAudio', tab: 'optKeepVideoAudio', type: 'checkbox' },
+            { tk: 'tkImgEffect', tab: 'optImageEffect', type: 'select' },
+            { tk: 'tkVidEffect', tab: 'optVideoEffect', type: 'select' },
+            { tk: 'tkBoomerang', tab: 'optBoomerang', type: 'checkbox' },
+        ];
+
+        function initMirrorSync() {
+            MIRROR_PAIRS.forEach(pair => {
+                const tkEl = document.getElementById(pair.tk);
+                const tabEl = document.getElementById(pair.tab);
+                if (!tkEl || !tabEl) return;
+
+                const prop = pair.type === 'checkbox' ? 'checked' : 'value';
+
+                tkEl.addEventListener('change', () => {
+                    if (tabEl[prop] === tkEl[prop]) return;
+                    tabEl[prop] = tkEl[prop];
+                    // 기존 핸들러 트리거
+                    if (pair.tk === 'tkSplit' && typeof onSplitMethodChange === 'function') onSplitMethodChange();
+                });
+
+                tabEl.addEventListener('change', () => {
+                    if (tkEl[prop] === tabEl[prop]) return;
+                    tkEl[prop] = tabEl[prop];
+                    // 기존 핸들러 트리거
+                    if (pair.tk === 'tkSplit' && typeof onTkSplitChange === 'function') onTkSplitChange();
+                    if (pair.tk === 'tkVideoGen' && typeof onTkVideoGenChange === 'function') onTkVideoGenChange();
+                });
+            });
+        }
+
         // 초기화
         // ═══════════════════════════════════════
         window.addEventListener('load', () => {
             loadSavedEmail();
             updateSplitOptions();
+            initMirrorSync();
         });
 
         // 페이지 닫힐 때 (새로고침, 탭 닫기 등) 연결 해제
