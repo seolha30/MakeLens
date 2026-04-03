@@ -3720,11 +3720,11 @@
                     const ucs = (v.use_cases || []).slice(0,2).map(u => uc_kr[u] || u).join(', ');
                     const info = [aStr, ucs].filter(x=>x).join(' · ');
                     const vname = v.name || v.voice_name || '';
-                    displayName = info ? `${gSpan}${vname} <span style="color:#888;font-size:11px;">(${info})</span>` : `${gSpan}${vname}`;
+                    displayName = info ? `${gSpan}${vname} <span style="color:#888;font-size:13px;">(${info})</span>` : `${gSpan}${vname}`;
                     sub = '';
                 }
-                return `<div class="voice-pick-item" data-idx="${i}" onclick="selectVoice('${provider}','${speakerName}',${i})" style="padding:10px 14px;border-bottom:1px solid #2a2c3e;cursor:pointer;">
-                    <div style="font-size:13px;color:#fff;font-weight:600;">${displayName}</div>
+                return `<div class="voice-pick-item" data-idx="${i}" onclick="selectVoice('${provider}','${speakerName}',${i})" style="padding:14px 18px;border-bottom:1px solid #2a2c3e;cursor:pointer;">
+                    <div style="font-size:15px;color:#fff;font-weight:600;">${displayName}</div>
                     ${sub ? `<div style="font-size:11px;color:#888;">${sub}</div>` : ''}
                 </div>`;
             }).join('');
@@ -3926,10 +3926,10 @@
                     const aStr = age_kr[v.age] || '';
                     const ucs = (v.use_cases || []).slice(0,2).map(u => uc_kr[u] || u).join(', ');
                     const info = [aStr, ucs].filter(x=>x).join(' · ');
-                    displayName = info ? `${gSpan}${v.name} <span style="color:#888;font-size:11px;">(${info})</span>` : `${gSpan}${v.name}`;
+                    displayName = info ? `${gSpan}${v.name} <span style="color:#888;font-size:13px;">(${info})</span>` : `${gSpan}${v.name}`;
                 }
-                return `<div class="voice-pick-item" data-idx="${i}" onclick="selectTkVoice('${provider}',${i})" style="padding:10px 14px;border-bottom:1px solid #2a2c3e;cursor:pointer;">
-                    <div style="font-size:13px;color:#fff;font-weight:600;">${displayName}</div>
+                return `<div class="voice-pick-item" data-idx="${i}" onclick="selectTkVoice('${provider}',${i})" style="padding:14px 18px;border-bottom:1px solid #2a2c3e;cursor:pointer;">
+                    <div style="font-size:15px;color:#fff;font-weight:600;">${displayName}</div>
                 </div>`;
             }).join('');
 
