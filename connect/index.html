@@ -963,7 +963,8 @@
             align-items: center;
             gap: 8px;
             padding: 12px;
-            background: rgba(255, 255, 255, 0.03);
+            background: #0d0e14;
+            border: 1px solid #2a2c34;
             border-radius: 10px;
             margin-bottom: 8px;
             flex-wrap: wrap;
@@ -1132,7 +1133,6 @@
                     <span style="color: #444;">·</span>
                     <span id="selectedPcDetail" style="color: #888; font-size: 12px;">확인 중...</span>
                     <span id="btnSwitchPc" style="display: none; margin-left: auto; font-size: 11px; color: #667eea; cursor: pointer;">▾</span>
-                    <!-- PC 전환 드롭다운 -->
                     <div id="pcSwitchDropdown" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #12131a; border: 1px solid #667eea; border-radius: 10px; z-index: 100; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.5);"></div>
                 </div>
 
@@ -1474,47 +1474,33 @@
 
                 <!-- ═══ 탭 2: 장면/이미지 ═══ -->
                 <div class="tab-content" id="tab2">
-                    <!-- 스타일 -->
-                    <div style="margin-bottom: 12px;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎨 스타일</div>
-                        <select id="optStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
-                            <option value="커스텀">커스텀</option>
-                            <option value="졸라맨 실사 합성">졸라맨 실사 합성</option>
-                            <option value="K웹툰 실사">K웹툰 실사</option>
-                            <option value="감성 수채화">감성 수채화</option>
-                            <option value="실사">실사</option>
-                            <option value="3D 애니메이션">3D 애니메이션</option>
-                            <option value="K웹툰">K웹툰</option>
-                            <option value="사이버펑크">사이버펑크</option>
-                            <option value="클레이 애니메이션">클레이 애니메이션</option>
-                            <option value="미국 코믹북">미국 코믹북</option>
-                            <option value="연필 스케치">연필 스케치</option>
-                            <option value="팝아트">팝아트</option>
-                            <option value="일본 애니메이션">일본 애니메이션</option>
-                            <option value="픽셀아트">픽셀아트</option>
-                            <option value="파스텔 몽환">파스텔 몽환</option>
-                            <option value="종이공예">종이공예</option>
-                            <option value="유화 명화">유화 명화</option>
-                            <option value="인포그래픽">인포그래픽</option>
-                        </select>
-                    </div>
-
-                    <!-- 이미지 수 -->
-                    <div style="margin-bottom: 12px;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🖼️ 이미지 수</div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <select id="optSplitMethod" onchange="onSplitMethodChange()" style="flex: 1; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
+                    <!-- 스타일 + 이미지 모델 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎨 스타일</div>
+                            <select id="optStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
+                                <option value="커스텀">커스텀</option>
+                                <option value="졸라맨 실사 합성">졸라맨 실사 합성</option>
+                                <option value="K웹툰 실사">K웹툰 실사</option>
+                                <option value="감성 수채화">감성 수채화</option>
+                                <option value="실사">실사</option>
+                                <option value="3D 애니메이션">3D 애니메이션</option>
+                                <option value="K웹툰">K웹툰</option>
+                                <option value="사이버펑크">사이버펑크</option>
+                                <option value="클레이 애니메이션">클레이 애니메이션</option>
+                                <option value="미국 코믹북">미국 코믹북</option>
+                                <option value="연필 스케치">연필 스케치</option>
+                                <option value="팝아트">팝아트</option>
+                                <option value="일본 애니메이션">일본 애니메이션</option>
+                                <option value="픽셀아트">픽셀아트</option>
+                                <option value="파스텔 몽환">파스텔 몽환</option>
+                                <option value="종이공예">종이공예</option>
+                                <option value="유화 명화">유화 명화</option>
+                                <option value="인포그래픽">인포그래픽</option>
                             </select>
-                            <div id="splitCountBox" style="display: none; align-items: center; gap: 4px;">
-                                <input type="number" id="optSplitCount" value="8" min="1" max="100" style="width: 50px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 6px; color: #fff; padding: 6px; text-align: center; font-size: 13px;">
-                                <span id="splitSuffix" style="font-size: 12px; color: #888;">장</span>
-                            </div>
                         </div>
-                    </div>
-
-                    <!-- 이미지 모델 -->
-                    <div style="margin-bottom: 12px;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🤖 이미지 모델</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🤖 이미지 모델</div>
                         <select id="optImageModel" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
                             <option value="나노바나나2 - 자동">나노바나나2 - 자동</option>
                             <option value="나노바나나 프로 - 자동">나노바나나 프로 - 자동</option>
@@ -1530,6 +1516,20 @@
                             <option value="위스크 (Whisk) - 1:1">위스크 (Whisk) - 1:1</option>
                             <option value="플로우 (Flow) - 1:1">플로우 (Flow) - 1:1</option>
                         </select>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 수 -->
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🖼️ 이미지 수</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <select id="optSplitMethod" onchange="onSplitMethodChange()" style="flex: 3; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
+                            </select>
+                            <div id="splitCountBox" style="display: none; align-items: center; gap: 4px;">
+                                <input type="number" id="optSplitCount" value="8" min="1" max="100" style="width: 64px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 12px 6px; text-align: center; font-size: 13px;">
+                                <span id="splitSuffix" style="font-size: 12px; color: #888;">장</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 이미지 프롬프트 추가지시 -->
@@ -1581,54 +1581,54 @@
 
                     <!-- ═══ Gemini 설정 ═══ -->
                     <div id="ttsGemini" class="tts-panel">
-                        <!-- 목소리 -->
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎤 목소리</div>
-                            <select id="geminiVoice" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
-                                <optgroup label="남성">
-                                    <option value="Orus">태성</option>
-                                    <option value="Charon">민수</option>
-                                    <option value="Alnilam">승우</option>
-                                    <option value="Puck">지한</option>
-                                    <option value="Algenib">성진</option>
-                                    <option value="Fenrir">현우</option>
-                                    <option value="Iapetus">민혁</option>
-                                    <option value="Umbriel">준호</option>
-                                    <option value="Achird">동혁</option>
-                                    <option value="Enceladus">서준</option>
-                                </optgroup>
-                                <optgroup label="여성">
-                                    <option value="Leda">유나</option>
-                                    <option value="Kore" selected>서연</option>
-                                    <option value="Aoede">민지</option>
-                                    <option value="Gacrux">은지</option>
-                                    <option value="Zephyr">소희</option>
-                                    <option value="Callirrhoe">수진</option>
-                                    <option value="Laomedeia">지수</option>
-                                    <option value="Autonoe">소은</option>
-                                    <option value="Achernar">지선</option>
-                                    <option value="Despina">하윤</option>
-                                </optgroup>
-                            </select>
-                        </div>
-
-                        <!-- 말하기 스타일 -->
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎭 말하기 스타일</div>
-                            <select id="geminiStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 13px;">
-                                <option value="기본">기본</option>
-                                <option value="명랑하게">명랑하게</option>
-                                <option value="차분하게">차분하게</option>
-                                <option value="강하고 단호하게">강하고 단호하게</option>
-                                <option value="뉴스 리포터처럼">뉴스 리포터처럼</option>
-                                <option value="다정하고 따뜻하게">다정하고 따뜻하게</option>
-                                <option value="진지하고 엄격하게">진지하고 엄격하게</option>
-                                <option value="속삭이는 듯">속삭이는 듯</option>
-                                <option value="슬프고 애절하게">슬프고 애절하게</option>
-                                <option value="신비롭고 몽환적으로">신비롭고 몽환적으로</option>
-                                <option value="긴장감 있게">긴장감 있게</option>
-                                <option value="전문가처럼 박식하게">전문가처럼 박식하게</option>
-                            </select>
+                        <!-- 목소리 + 말하기 스타일 -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎤 목소리</div>
+                                <select id="geminiVoice" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
+                                    <optgroup label="남성">
+                                        <option value="Orus">태성</option>
+                                        <option value="Charon">민수</option>
+                                        <option value="Alnilam">승우</option>
+                                        <option value="Puck">지한</option>
+                                        <option value="Algenib">성진</option>
+                                        <option value="Fenrir">현우</option>
+                                        <option value="Iapetus">민혁</option>
+                                        <option value="Umbriel">준호</option>
+                                        <option value="Achird">동혁</option>
+                                        <option value="Enceladus">서준</option>
+                                    </optgroup>
+                                    <optgroup label="여성">
+                                        <option value="Leda">유나</option>
+                                        <option value="Kore" selected>서연</option>
+                                        <option value="Aoede">민지</option>
+                                        <option value="Gacrux">은지</option>
+                                        <option value="Zephyr">소희</option>
+                                        <option value="Callirrhoe">수진</option>
+                                        <option value="Laomedeia">지수</option>
+                                        <option value="Autonoe">소은</option>
+                                        <option value="Achernar">지선</option>
+                                        <option value="Despina">하윤</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎭 말하기 스타일</div>
+                                <select id="geminiStyle" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
+                                    <option value="기본">기본</option>
+                                    <option value="명랑하게">명랑하게</option>
+                                    <option value="차분하게">차분하게</option>
+                                    <option value="강하고 단호하게">강하고 단호하게</option>
+                                    <option value="뉴스 리포터처럼">뉴스 리포터처럼</option>
+                                    <option value="다정하고 따뜻하게">다정하고 따뜻하게</option>
+                                    <option value="진지하고 엄격하게">진지하고 엄격하게</option>
+                                    <option value="속삭이는 듯">속삭이는 듯</option>
+                                    <option value="슬프고 애절하게">슬프고 애절하게</option>
+                                    <option value="신비롭고 몽환적으로">신비롭고 몽환적으로</option>
+                                    <option value="긴장감 있게">긴장감 있게</option>
+                                    <option value="전문가처럼 박식하게">전문가처럼 박식하게</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- 속도 + 500자 분할 -->
@@ -1658,29 +1658,33 @@
                             </div>
                         </div>
 
-                        <!-- 디렉팅 -->
+                        <!-- 말투 세부지시 -->
                         <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">📝 디렉팅 (추가 지시)</div>
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">📝 말투 세부지시 (선택 사항)</div>
                             <input type="text" id="geminiDirecting" placeholder="예: 뉴스 앵커처럼 깔끔하고 단호하게, 3초마다 끊어서 읽어줘" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px;">
                         </div>
                     </div>
 
                     <!-- ═══ ElevenLabs 설정 ═══ -->
                     <div id="ttsElevenlabs" class="tts-panel" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600;">🎭 화자별 설정</div>
-                            <span id="elCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="elCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                        <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-size: 13px; color: #667eea; font-weight: 700;">🎭 화자별 설정</div>
+                                <span id="elCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="elCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                            </div>
+                            <div id="elSpeakerTable"></div>
                         </div>
-                        <div id="elSpeakerTable"></div>
                     </div>
 
                     <!-- ═══ Typecast 설정 ═══ -->
                     <div id="ttsTypecast" class="tts-panel" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600;">🎭 화자별 설정</div>
-                            <span id="tcCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="tcCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                        <div style="background: #12131a; border: 1px solid #3a3c3e; border-radius: 12px; padding: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-size: 13px; color: #667eea; font-weight: 700;">🎭 화자별 설정</div>
+                                <span id="tcCreditsDisplay" style="font-size: 11px; color: #888;">💳 <span id="tcCreditsValue" style="color: #8fa4f0; font-weight: 600;">-</span></span>
+                            </div>
+                            <div id="tcSpeakerTable"></div>
                         </div>
-                        <div id="tcSpeakerTable"></div>
                     </div>
 
                     <!-- ═══ 대본 (항상 표시, 항상 화자 표시) ═══ -->
@@ -2131,9 +2135,6 @@
             }
         }
 
-        // ═══════════════════════════════════════
-        // PC 선택 화면
-        // ═══════════════════════════════════════
         // ── PC 별명 (브라우저 로컬 저장) ──
         function getPcNicknames() {
             try { return JSON.parse(localStorage.getItem('makelens_pc_nicknames') || '{}'); } catch { return {}; }
@@ -2152,15 +2153,58 @@
             const node = currentUser.nodes[index];
             const current = getPcNicknames()[node.key] || '';
             const input = prompt('이 PC의 별명을 입력하세요 (비우면 원래 이름으로)', current);
-            if (input === null) return; // 취소
+            if (input === null) return;
             savePcNickname(node.key, input.trim());
             renderPcList(currentUser.nodes);
-            // 현재 선택된 PC면 상단 이름도 갱신
             if (selectedPcKey === node.key) {
                 document.getElementById('selectedPcName').textContent = getPcDisplayName(node, index);
             }
         }
 
+        // ── PC 전환 드롭다운 ──
+        function togglePcSwitchDropdown() {
+            const dropdown = document.getElementById('pcSwitchDropdown');
+            if (dropdown.style.display !== 'none') { dropdown.style.display = 'none'; return; }
+            const nodes = currentUser.nodes;
+            dropdown.innerHTML = nodes.map((node, i) => {
+                const name = getPcDisplayName(node, i);
+                const isCurrent = node.key === selectedPcKey;
+                return `<div onclick="switchToPc(${i})" style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; transition: background 0.2s; ${isCurrent ? 'background: rgba(102,126,234,0.15);' : ''}" onmouseenter="this.style.background='rgba(102,126,234,0.1)'" onmouseleave="this.style.background='${isCurrent ? 'rgba(102,126,234,0.15)' : 'transparent'}'">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${node.온라인 ? '#28a745' : '#6c757d'}; flex-shrink: 0;"></div>
+                    <span style="color: #fff; font-size: 13px; font-weight: ${isCurrent ? '700' : '400'};">${name}</span>
+                    ${isCurrent ? '<span style="margin-left: auto; font-size: 11px; color: #667eea;">현재</span>' : ''}
+                </div>`;
+            }).join('');
+            dropdown.style.display = 'block';
+            setTimeout(() => {
+                const close = (e) => { if (!dropdown.contains(e.target)) { dropdown.style.display = 'none'; document.removeEventListener('click', close); } };
+                document.addEventListener('click', close);
+            }, 0);
+        }
+        function switchToPc(index) {
+            const node = currentUser.nodes[index];
+            if (node.key === selectedPcKey) { document.getElementById('pcSwitchDropdown').style.display = 'none'; return; }
+            if (window._onlineSource) { window._onlineSource.close(); window._onlineSource = null; }
+            if (window._statusSource) { window._statusSource.close(); window._statusSource = null; }
+            if (window._currentProjectSource) { window._currentProjectSource.close(); window._currentProjectSource = null; }
+            if (!TEST_MODE && selectedComputerId) {
+                firebaseSet(`remote/${selectedComputerId}/phone_connected`, false).catch(() => {});
+            }
+            selectedPcKey = node.key;
+            selectedPcData = node;
+            selectedComputerId = node.컴퓨터ID;
+            document.getElementById('pcSwitchDropdown').style.display = 'none';
+            const select = document.getElementById('projectSelect');
+            select.innerHTML = '<option value="">프로젝트를 선택하세요</option><option value="__new__">＋ 새 프로젝트</option>';
+            document.getElementById('tabNav').style.display = 'none';
+            document.getElementById('tab1Empty').style.display = '';
+            document.getElementById('tab1Content').style.display = 'none';
+            enterControlScreen();
+        }
+
+        // ═══════════════════════════════════════
+        // PC 선택 화면
+        // ═══════════════════════════════════════
         async function renderPcList(nodes) {
             const container = document.getElementById('pcList');
             // 먼저 로딩 상태로 그리기
@@ -2206,55 +2250,6 @@
             selectedPcKey = node.key;
             selectedPcData = node;
             selectedComputerId = node.컴퓨터ID;
-            enterControlScreen();
-        }
-
-        // ── PC 전환 드롭다운 ──
-        function togglePcSwitchDropdown() {
-            const dropdown = document.getElementById('pcSwitchDropdown');
-            if (dropdown.style.display !== 'none') { dropdown.style.display = 'none'; return; }
-            const nodes = currentUser.nodes;
-            dropdown.innerHTML = nodes.map((node, i) => {
-                const name = getPcDisplayName(node, i);
-                const isCurrent = node.key === selectedPcKey;
-                return `<div onclick="switchToPc(${i})" style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; transition: background 0.2s; ${isCurrent ? 'background: rgba(102,126,234,0.15);' : ''}" onmouseenter="this.style.background='rgba(102,126,234,0.1)'" onmouseleave="this.style.background='${isCurrent ? 'rgba(102,126,234,0.15)' : 'transparent'}'">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${node.온라인 ? '#28a745' : '#6c757d'}; flex-shrink: 0;"></div>
-                    <span style="color: #fff; font-size: 13px; font-weight: ${isCurrent ? '700' : '400'};">${name}</span>
-                    ${isCurrent ? '<span style="margin-left: auto; font-size: 11px; color: #667eea;">현재</span>' : ''}
-                </div>`;
-            }).join('');
-            dropdown.style.display = 'block';
-            // 바깥 클릭 시 닫기
-            setTimeout(() => {
-                const close = (e) => { if (!dropdown.contains(e.target)) { dropdown.style.display = 'none'; document.removeEventListener('click', close); } };
-                document.addEventListener('click', close);
-            }, 0);
-        }
-        function switchToPc(index) {
-            const node = currentUser.nodes[index];
-            if (node.key === selectedPcKey) { document.getElementById('pcSwitchDropdown').style.display = 'none'; return; }
-
-            // 이전 PC 정리: 리스너 해제 + 연결 해제 알림
-            if (window._onlineSource) { window._onlineSource.close(); window._onlineSource = null; }
-            if (window._statusSource) { window._statusSource.close(); window._statusSource = null; }
-            if (window._currentProjectSource) { window._currentProjectSource.close(); window._currentProjectSource = null; }
-            if (!TEST_MODE && selectedComputerId) {
-                firebaseSet(`remote/${selectedComputerId}/phone_connected`, false).catch(() => {});
-            }
-
-            // 새 PC로 전환
-            selectedPcKey = node.key;
-            selectedPcData = node;
-            selectedComputerId = node.컴퓨터ID;
-            document.getElementById('pcSwitchDropdown').style.display = 'none';
-
-            // 프로젝트 목록 초기화 후 새로 진입
-            const select = document.getElementById('projectSelect');
-            select.innerHTML = '<option value="">프로젝트를 선택하세요</option><option value="__new__">＋ 새 프로젝트</option>';
-            document.getElementById('tabNav').style.display = 'none';
-            document.getElementById('tab1Empty').style.display = '';
-            document.getElementById('tab1Content').style.display = 'none';
-
             enterControlScreen();
         }
 
