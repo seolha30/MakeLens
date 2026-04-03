@@ -1205,10 +1205,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 10px; align-items: center; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 10px 12px;">
-                                <div style="flex: 1; display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 12px; color: #ccc;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
-                                <div style="width: 1px; height: 20px; background: #2a2c34;"></div>
-                                <div style="flex: 1; display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
+                            <!-- 추가지시 -->
+                            <div style="margin-bottom: 8px;">
+                                <input type="text" id="tkPromptDirective" placeholder="추가지시: 예) 모든 등장인물을 고양이로 표현해줘" style="width: 100%; padding: 9px 12px; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 8px; color: #fff; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <!-- 토글 2x2 그리드 -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #ccc;">이미지 자동 재시도</span><label class="toggle"><input type="checkbox" id="tkSleepMode"><span class="slider"></span></label></div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #ccc;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkVideo10sLabel">영상 10초 생성</span><label class="toggle"><input type="checkbox" id="tkVideo10s" disabled><span class="slider"></span></label></div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
                             </div>
                         </div>
 
@@ -1245,7 +1251,7 @@
                                             <option value="0.8">0.8x 느림</option><option value="0.9">0.9x</option><option value="1.0">1.0x 보통</option><option value="1.1" selected>1.1x 기본</option><option value="1.2">1.2x</option><option value="1.3">1.3x 빠름</option><option value="1.5">1.5x</option><option value="2.0">2.0x 최대</option>
                                         </select>
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 6px; padding-bottom: 2px;">
+                                    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 2px;">
                                         <span style="font-size: 12px; color: #aaa; white-space: nowrap;">500자 분할</span>
                                         <label class="toggle"><input type="checkbox" id="tkGeminiSplit500" checked><span class="slider"></span></label>
                                     </div>
@@ -2224,22 +2230,25 @@
                     </div>
                 `;
             }).join('');
-            // Firebase remote/{컴퓨터ID}/online 값 읽어서 상태 업데이트
+            // Firebase remote/{컴퓨터ID}/online 실시간 감시 (PC 나중에 켜도 바로 반영)
+            if (!window._pcListOnlineSources) window._pcListOnlineSources = [];
+            // 이전 리스너 정리
+            window._pcListOnlineSources.forEach(s => { try { s(); } catch(e){} });
+            window._pcListOnlineSources = [];
             for (let i = 0; i < nodes.length; i++) {
                 const cid = nodes[i].컴퓨터ID;
                 const plan = nodes[i].타입 || '알 수 없음';
+                const idx = i;
                 if (!cid) continue;
-                try {
-                    const val = await firebaseGet(`remote/${cid}/online`);
+                const unsub = firebaseListen(`remote/${cid}/online`, (val) => {
                     const isOnline = val === true;
-                    nodes[i].온라인 = isOnline;
-                    const statusEl = document.getElementById(`pcStatus_${i}`);
-                    const detailEl = document.getElementById(`pcDetail_${i}`);
+                    nodes[idx].온라인 = isOnline;
+                    const statusEl = document.getElementById(`pcStatus_${idx}`);
+                    const detailEl = document.getElementById(`pcDetail_${idx}`);
                     if (statusEl) statusEl.className = `pc-status ${isOnline ? 'online' : 'offline'}`;
                     if (detailEl) detailEl.textContent = `${isOnline ? '온라인' : '오프라인'} · ${plan}`;
-                } catch (e) {
-                    console.error(`[PC ${i}] 온라인 상태 확인 실패`, e);
-                }
+                });
+                window._pcListOnlineSources.push(unsub);
             }
         }
 
@@ -2257,6 +2266,11 @@
         // 컨트롤러 화면 진입
         // ═══════════════════════════════════════
         function enterControlScreen() {
+            // PC 목록 온라인 감시 리스너 정리 (안쪽 진입 시 불필요)
+            if (window._pcListOnlineSources) {
+                window._pcListOnlineSources.forEach(s => { try { s(); } catch(e){} });
+                window._pcListOnlineSources = [];
+            }
             document.getElementById('displayEmail').textContent = currentUser.email;
             document.getElementById('displayPlan').textContent = selectedPcData.타입 || '--';
             document.getElementById('selectedPcName').textContent = getPcDisplayName(selectedPcData, currentUser.nodes.indexOf(selectedPcData));
@@ -2499,7 +2513,15 @@
                                 el.className = `step-item ${st}`;
                                 el.querySelector('.step-icon').textContent = iconMap[st] || '⏳';
                                 const detail = document.getElementById(`step-${step}-detail`);
-                                if (detail && status[step].detail) detail.textContent = status[step].detail;
+                                if (detail) {
+                                    if (st === 'running') {
+                                        _startStepTimer(step, status[step].startTime);
+                                    } else {
+                                        _stopStepTimer(step);
+                                        if (status[step].detail) detail.textContent = status[step].detail;
+                                        else if (st === 'done' || st === 'success') detail.textContent = '완료';
+                                    }
+                                }
                                 if (st === 'done' || st === 'success') doneCount++;
                                 if (st === 'running') hasRunning = true;
                             });
@@ -3148,8 +3170,15 @@
                     }
                 }
                 // 딸깍 모달: 탭4 옵션 동기화
+                // 추가지시
+                const tkPd = document.getElementById('tkPromptDirective');
+                if (tkPd) tkPd.value = data.prompt_directive || '';
+                // 이미지 자동 재시도
+                setCheck('tkSleepMode', !!data.sleep_mode);
                 setCheck('tkVideoGen', data.video_generation);
                 onTkVideoGenChange();
+                setCheck('tkVideo10s', !!data.video_10s_mode);
+                _video10sEnabled = !!data.video_10s_mode;
                 setCheck('tkBoomerang', !!data.boomerang_mode);
                 setSelectByValue(document.getElementById('tkImgEffect'), EFFECT_MAP[data.image_effect] || 'none');
                 setSelectByValue(document.getElementById('tkVidEffect'), EFFECT_MAP[data.video_effect] || 'none');
@@ -3271,6 +3300,7 @@
         // ═══════════════════════════════════════
         function showProgressPanel() {
             _ttalkkakRunning = true;
+            _stopAllStepTimers();
             const overlay = document.getElementById('progressPanelOverlay');
             overlay.style.display = 'flex';
             const panel = document.getElementById('progressPanel');
@@ -3293,6 +3323,42 @@
             document.getElementById('progressText').textContent = '명령 전송 완료, PC 응답 대기 중...';
             document.getElementById('progressTitleText').textContent = '딸깍 진행 중...';
             document.getElementById('progressSpinner').style.display = '';
+        }
+
+        // 경과시간 타이머 관리
+        let _stepTimers = {};  // { stepName: { interval, startTime } }
+
+        function _startStepTimer(step, serverStartTime) {
+            // serverStartTime이 바뀌면 타이머 재시작 (단계 재진입)
+            if (_stepTimers[step]) {
+                if (_stepTimers[step].serverStartTime === serverStartTime) return;
+                clearInterval(_stepTimers[step].interval);
+                delete _stepTimers[step];
+            }
+            // 서버 시작 시간이 있으면 그 기준, 없으면 지금부터
+            const baseTime = serverStartTime ? serverStartTime * 1000 : Date.now();
+            const detail = document.getElementById(`step-${step}-detail`);
+            if (!detail) return;
+            const update = () => {
+                const elapsed = Math.floor((Date.now() - baseTime) / 1000);
+                const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const ss = String(elapsed % 60).padStart(2, '0');
+                detail.textContent = `진행 중... ⏱ ${mm}:${ss}`;
+            };
+            update();
+            const interval = setInterval(update, 1000);
+            _stepTimers[step] = { interval, serverStartTime };
+        }
+
+        function _stopStepTimer(step) {
+            if (_stepTimers[step]) {
+                clearInterval(_stepTimers[step].interval);
+                delete _stepTimers[step];
+            }
+        }
+
+        function _stopAllStepTimers() {
+            Object.keys(_stepTimers).forEach(s => _stopStepTimer(s));
         }
 
         function listenProgress() {
@@ -3327,8 +3393,14 @@
                         el.querySelector('.step-icon').textContent = stepMap[step].icon[stepStatus] || '⏳';
 
                         const detail = document.getElementById(`step-${step}-detail`);
-                        if (detail && status[step].detail) {
-                            detail.textContent = status[step].detail;
+                        if (detail) {
+                            if (stepStatus === 'running') {
+                                _startStepTimer(step, status[step].startTime);
+                            } else {
+                                _stopStepTimer(step);
+                                if (status[step].detail) detail.textContent = status[step].detail;
+                                else if (stepStatus === 'done' || stepStatus === 'success') detail.textContent = '완료';
+                            }
                         }
                     }
                 });
@@ -3353,6 +3425,7 @@
 
                 // 완료 또는 에러
                 if (status.overall === 'completed') {
+                    _stopAllStepTimers();
                     document.getElementById('progressTitleText').textContent = '✅ 완료!';
                     document.getElementById('progressSpinner').style.display = 'none';
                     document.getElementById('btnStop').style.display = 'none';
@@ -3370,12 +3443,14 @@
                         if (cp && cp !== '' && cp !== '__new__') loadProjectData(cp);
                     }, 2000);
                 } else if (status.overall === 'error') {
+                    _stopAllStepTimers();
                     document.getElementById('progressTitleText').textContent = '❌ 오류 발생';
                     document.getElementById('progressSpinner').style.display = 'none';
                     document.getElementById('btnStop').style.display = 'none';
                     showAlert('오류가 발생했습니다: ' + (status.error_message || ''), 'error');
                     setTimeout(() => { _ttalkkakRunning = false; document.getElementById('progressPanelOverlay').style.display = 'none'; }, 3000);
                 } else if (status.overall === 'stopped') {
+                    _stopAllStepTimers();
                     document.getElementById('progressTitleText').textContent = '⏹ 중단됨';
                     document.getElementById('progressSpinner').style.display = 'none';
                     document.getElementById('btnStop').style.display = 'none';
@@ -3988,6 +4063,12 @@
 
         function onTkVideoGenChange() {
             const checked = document.getElementById('tkVideoGen').checked;
+            // 10초 생성: 동영상 생성 꺼지면 비활성화
+            const video10s = document.getElementById('tkVideo10s');
+            const video10sLabel = document.getElementById('tkVideo10sLabel');
+            video10s.disabled = !checked;
+            if (!checked) { video10s.checked = false; _video10sEnabled = false; }
+            video10sLabel.style.color = checked ? '#ddd' : '#555';
             // 부메랑: 동영상 생성 꺼지면 비활성화
             const boomerang = document.getElementById('tkBoomerang');
             const boomerangLabel = document.getElementById('tkBoomerangLabel');
@@ -4087,7 +4168,10 @@
                     video_effect: document.getElementById('tkVidEffect').value,
                     sfx: document.getElementById('tkSfx').value,
                     bgm: document.getElementById('tkBgm').value,
+                    prompt_directive: document.getElementById('tkPromptDirective').value,
+                    sleep_mode: document.getElementById('tkSleepMode').checked,
                     video_generation: document.getElementById('tkVideoGen').checked,
+                    video_10s_mode: document.getElementById('tkVideo10s').checked,
                     boomerang_mode: document.getElementById('tkBoomerang').checked,
                     scope: document.getElementById('tkScope').value,
                     auto_retry: true,
@@ -4613,6 +4697,10 @@
             overlay.innerHTML = `
                 <div style="background:#1A1C24;border:1px solid #30343D;border-radius:16px;max-width:350px;width:100%;padding:24px;">
                     <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;">🎬 동영상 생성</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;background:#12131a;border:1px solid #3a3c3e;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+                        <span style="font-size:13px;color:#ccc;">⏱️ 영상 10초 생성</span>
+                        <label class="toggle"><input type="checkbox" id="videoPopup10s" onchange="onVideoPopup10sChange()"><span class="slider"></span></label>
+                    </div>
                     <div style="display:flex;flex-direction:column;gap:10px;">
                         <button onclick="document.getElementById('genOptionsOverlay').remove();remoteGenerateVideos('all')" style="padding:14px;background:#12131a;border:1px solid #3a3c3e;border-radius:10px;color:#fff;font-size:13px;cursor:pointer;text-align:left;">🔄 <b>전체 동영상 생성</b><br><span style="color:#888;font-size:11px;">모든 장면의 동영상을 새로 생성합니다</span></button>
                         <button onclick="document.getElementById('genOptionsOverlay').remove();remoteGenerateVideos('continue')" style="padding:14px;background:#12131a;border:1px solid #3a3c3e;border-radius:10px;color:#fff;font-size:13px;cursor:pointer;text-align:left;">▶️ <b>이어서 동영상 생성</b><br><span style="color:#888;font-size:11px;">동영상이 없는 장면만 생성합니다</span></button>
@@ -4622,6 +4710,18 @@
             `;
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
+            // 전역 10초 상태 반영
+            const popup10s = document.getElementById('videoPopup10s');
+            if (popup10s) popup10s.checked = _video10sEnabled;
+        }
+
+        let _video10sEnabled = false; // 전역 10초 상태
+        function onVideoPopup10sChange() {
+            const popup10s = document.getElementById('videoPopup10s');
+            if (popup10s) _video10sEnabled = popup10s.checked;
+            // 딸깍 토글 미러링 (DOM에 있으면)
+            const tk10s = document.getElementById('tkVideo10s');
+            if (tk10s) tk10s.checked = _video10sEnabled;
         }
 
         async function remoteGenerateVideos(mode) {
@@ -4631,6 +4731,7 @@
                     action: 'generate_videos',
                     mode: mode,
                     model: document.getElementById('optImageModel').value,
+                    video_10s_mode: _video10sEnabled,
                     timestamp: Date.now()
                 });
                 showAlert(`${mode === 'all' ? '전체' : '이어서'} 동영상 생성 요청`, 'info');
@@ -4672,6 +4773,7 @@
                 await firebaseSet(`remote/${selectedComputerId}/command`, {
                     action: 'generate_single_video',
                     scene_no: sceneNo,
+                    video_10s_mode: _video10sEnabled,
                     timestamp: Date.now()
                 });
                 showAlert(`장면 #${sceneNo} 동영상 생성 요청`, 'success');
@@ -4819,6 +4921,7 @@
         // ═══════════════════════════════════════
         const MIRROR_PAIRS = [
             // 탭2: 장면/이미지
+            { tk: 'tkPromptDirective', tab: 'optPromptDirective', type: 'input' },
             { tk: 'tkModel', tab: 'optImageModel', type: 'select' },
             { tk: 'tkStyle', tab: 'optStyle', type: 'select' },
             { tk: 'tkSplit', tab: 'optSplitMethod', type: 'select' },
