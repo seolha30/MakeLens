@@ -1403,13 +1403,13 @@
                             </div>
                             <!-- 쇼츠 길이 -->
                             <div id="shortsLengthBox" style="display: flex; align-items: center; gap: 3px; color: #888;">
-                                <input type="number" id="shortsLength" value="30" min="10" max="180" oninput="updateCharEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
+                                <input type="number" id="shortsLength" value="30" min="10" max="180" onchange="updateCharEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
                                 <span>초</span>
                                 <span id="charEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 360자)</span>
                             </div>
                             <!-- 롱폼 길이 -->
                             <div id="longformLengthBox" style="display: none; align-items: center; gap: 3px; color: #888;">
-                                <input type="number" id="longformLength" value="1" min="1" max="60" oninput="updateLongformEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
+                                <input type="number" id="longformLength" value="1" min="1" max="60" onchange="updateLongformEstimate()" style="width: 52px; background: #1a1c24; border: 1px solid #3a3c3e; border-radius: 5px; color: #fff; padding: 4px; text-align: center; font-size: 12px;">
                                 <span>분</span>
                                 <span id="longformEstimate" style="color: #667eea; font-weight: 600; font-size: 11px;">(약 720자)</span>
                             </div>
@@ -3794,9 +3794,10 @@
                 speaker.voice = displayName;
             }
 
-            // UI 갱신
-            if (provider === 'elevenlabs') renderElevenLabsSpeakers(dummySpeakersAll.el);
-            else renderTypecastSpeakers(dummySpeakersAll.tc);
+            // UI 갱신 (화자모드 OFF면 나레이션만)
+            const _isOn = document.getElementById('speakerModeToggle').checked;
+            if (provider === 'elevenlabs') renderElevenLabsSpeakers(_isOn ? dummySpeakersAll.el : [dummySpeakersAll.el[0]]);
+            else renderTypecastSpeakers(_isOn ? dummySpeakersAll.tc : [dummySpeakersAll.tc[0]]);
 
             // 로컬에만 저장 (음성생성 시 한번에 전송 — Firebase 절약)
             if (!window._pendingVoiceSettings) window._pendingVoiceSettings = {};
@@ -3807,6 +3808,17 @@
                 best_model: voice.best_model || '',
                 category: voice.category || ''
             };
+
+            // 나레이션이면 딸깍 목소리 버튼도 동기화
+            if (speakerName === '나레이션') {
+                if (provider === 'elevenlabs') {
+                    const btn = document.getElementById('tkElVoiceBtn');
+                    if (btn) btn.textContent = displayName;
+                } else if (provider === 'typecast') {
+                    const btn = document.getElementById('tkTcVoiceBtn');
+                    if (btn) btn.textContent = displayName;
+                }
+            }
         }
 
         async function remoteGenerateVoice() {
@@ -4826,27 +4838,104 @@
             { tk: 'tkBoomerang', tab: 'optBoomerang', type: 'checkbox' },
         ];
 
+        let _mirrorSyncing = false; // 무한루프 방지
         function initMirrorSync() {
+            // ── TTS 프로바이더 미러링: 딸깍 라디오 ↔ 탭3 탭 ──
+            document.querySelectorAll('input[name="tkTts"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (_mirrorSyncing) return;
+                    _mirrorSyncing = true;
+                    switchTtsProvider(radio.value);
+                    _mirrorSyncing = false;
+                });
+            });
+            // 탭3 탭 클릭 → 딸깍 라디오 동기화 (switchTtsProvider를 감싸서)
+            const _origSwitchTts = switchTtsProvider;
+            switchTtsProvider = function(provider) {
+                _origSwitchTts(provider);
+                if (_mirrorSyncing) return;
+                _mirrorSyncing = true;
+                const tkRadio = document.querySelector(`input[name="tkTts"][value="${provider}"]`);
+                if (tkRadio && !tkRadio.checked) { tkRadio.checked = true; onTkTtsChange(); }
+                _mirrorSyncing = false;
+            };
+
+            // ── EL/TC 세부설정 미러링: 딸깍 ↔ 탭3 나레이션(첫번째 화자) ──
+            // 딸깍 변경 → 탭3 나레이션 화자 select 동기화
+            ['tkElModel', 'tkElStability', 'tkElSpeed'].forEach(tkId => {
+                const el = document.getElementById(tkId);
+                if (!el) return;
+                const fieldMap = { tkElModel: 'model_id', tkElStability: 'stability', tkElSpeed: 'speed' };
+                el.addEventListener('change', () => {
+                    // dummySpeakersAll.el 첫번째 화자에 값 반영
+                    if (dummySpeakersAll.el && dummySpeakersAll.el[0]) {
+                        dummySpeakersAll.el[0][fieldMap[tkId]] = el.value;
+                    }
+                    // 탭3 화자테이블의 나레이션 select도 갱신
+                    const tabSelect = document.querySelector(`#elSpeakerTable select[data-speaker="나레이션"][data-field="${fieldMap[tkId]}"]`);
+                    if (tabSelect && tabSelect.value !== el.value) tabSelect.value = el.value;
+                });
+            });
+            ['tkTcEmotion', 'tkTcIntensity', 'tkTcSpeed'].forEach(tkId => {
+                const el = document.getElementById(tkId);
+                if (!el) return;
+                const fieldMap = { tkTcEmotion: 'emotion', tkTcIntensity: 'intensity', tkTcSpeed: 'tempo' };
+                el.addEventListener('change', () => {
+                    if (dummySpeakersAll.tc && dummySpeakersAll.tc[0]) {
+                        dummySpeakersAll.tc[0][fieldMap[tkId]] = el.value;
+                    }
+                    const tabSelect = document.querySelector(`#tcSpeakerTable select[data-speaker="나레이션"][data-field="${fieldMap[tkId]}"]`);
+                    if (tabSelect && tabSelect.value !== el.value) tabSelect.value = el.value;
+                });
+            });
+
+            // ── 탭3 나레이션 화자 select → 딸깍 역동기화 (이벤트 위임) ──
+            const elTable = document.getElementById('elSpeakerTable');
+            if (elTable) elTable.addEventListener('change', (e) => {
+                if (e.target.dataset.speaker !== '나레이션') return;
+                const field = e.target.dataset.field;
+                const tkMap = { model_id: 'tkElModel', stability: 'tkElStability', speed: 'tkElSpeed' };
+                const tkEl = document.getElementById(tkMap[field]);
+                if (tkEl && tkEl.value !== e.target.value) tkEl.value = e.target.value;
+            });
+            const tcTable = document.getElementById('tcSpeakerTable');
+            if (tcTable) tcTable.addEventListener('change', (e) => {
+                if (e.target.dataset.speaker !== '나레이션') return;
+                const field = e.target.dataset.field;
+                const tkMap = { emotion: 'tkTcEmotion', intensity: 'tkTcIntensity', tempo: 'tkTcSpeed' };
+                const tkEl = document.getElementById(tkMap[field]);
+                if (tkEl && tkEl.value !== e.target.value) tkEl.value = e.target.value;
+            });
+
+            // ── 기본 MIRROR_PAIRS ──
             MIRROR_PAIRS.forEach(pair => {
                 const tkEl = document.getElementById(pair.tk);
                 const tabEl = document.getElementById(pair.tab);
                 if (!tkEl || !tabEl) return;
 
                 const prop = pair.type === 'checkbox' ? 'checked' : 'value';
+                const events = pair.type === 'input' ? ['change', 'input'] : ['change'];
 
-                tkEl.addEventListener('change', () => {
-                    if (tabEl[prop] === tkEl[prop]) return;
-                    tabEl[prop] = tkEl[prop];
-                    // 기존 핸들러 트리거
-                    if (pair.tk === 'tkSplit' && typeof onSplitMethodChange === 'function') onSplitMethodChange();
-                });
+                events.forEach(evt => {
+                    tkEl.addEventListener(evt, () => {
+                        if (_mirrorSyncing) return;
+                        _mirrorSyncing = true;
+                        if (tabEl[prop] !== tkEl[prop]) {
+                            tabEl[prop] = tkEl[prop];
+                            if (pair.tk === 'tkSplit') { if (typeof onSplitMethodChange === 'function') onSplitMethodChange(); }
+                        }
+                        _mirrorSyncing = false;
+                    });
 
-                tabEl.addEventListener('change', () => {
-                    if (tkEl[prop] === tabEl[prop]) return;
-                    tkEl[prop] = tabEl[prop];
-                    // 기존 핸들러 트리거
-                    if (pair.tk === 'tkSplit' && typeof onTkSplitChange === 'function') onTkSplitChange();
-                    if (pair.tk === 'tkVideoGen' && typeof onTkVideoGenChange === 'function') onTkVideoGenChange();
+                    tabEl.addEventListener(evt, () => {
+                        if (_mirrorSyncing) return;
+                        _mirrorSyncing = true;
+                        if (tkEl[prop] !== tabEl[prop]) {
+                            tkEl[prop] = tabEl[prop];
+                            if (pair.tk === 'tkSplit') { if (typeof onTkSplitChange === 'function') onTkSplitChange(); }
+                        }
+                        _mirrorSyncing = false;
+                    });
                 });
             });
         }
