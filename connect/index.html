@@ -214,6 +214,28 @@
             margin-top: 3px;
         }
 
+        .pc-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit-name {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .btn-edit-name:hover {
+            color: #667eea;
+        }
+
         /* ── 옵션 섹션 ── */
         .section {
             background: #12131a;
@@ -2111,17 +2133,47 @@
         // ═══════════════════════════════════════
         // PC 선택 화면
         // ═══════════════════════════════════════
+        // ── PC 별명 (브라우저 로컬 저장) ──
+        function getPcNicknames() {
+            try { return JSON.parse(localStorage.getItem('makelens_pc_nicknames') || '{}'); } catch { return {}; }
+        }
+        function savePcNickname(key, nickname) {
+            const data = getPcNicknames();
+            if (nickname) data[key] = nickname; else delete data[key];
+            localStorage.setItem('makelens_pc_nicknames', JSON.stringify(data));
+        }
+        function getPcDisplayName(node, index) {
+            const nicknames = getPcNicknames();
+            return nicknames[node.key] || node.사용자정보 || `PC ${index + 1}`;
+        }
+        function editPcNickname(index, event) {
+            event.stopPropagation();
+            const node = currentUser.nodes[index];
+            const current = getPcNicknames()[node.key] || '';
+            const input = prompt('이 PC의 별명을 입력하세요 (비우면 원래 이름으로)', current);
+            if (input === null) return; // 취소
+            savePcNickname(node.key, input.trim());
+            renderPcList(currentUser.nodes);
+            // 현재 선택된 PC면 상단 이름도 갱신
+            if (selectedPcKey === node.key) {
+                document.getElementById('selectedPcName').textContent = getPcDisplayName(node, index);
+            }
+        }
+
         async function renderPcList(nodes) {
             const container = document.getElementById('pcList');
             // 먼저 로딩 상태로 그리기
             container.innerHTML = nodes.map((node, i) => {
-                const name = node.사용자정보 || `PC ${i + 1}`;
+                const name = getPcDisplayName(node, i);
                 const plan = node.타입 || '알 수 없음';
                 return `
                     <div class="pc-item" onclick="choosePc(${i}, this)" data-index="${i}">
                         <div class="pc-status offline" id="pcStatus_${i}"></div>
                         <div class="pc-info">
-                            <div class="pc-name">${name}</div>
+                            <div class="pc-name-row">
+                                <div class="pc-name">${name}</div>
+                                <button class="btn-edit-name" onclick="editPcNickname(${i}, event)" title="별명 변경">✏️</button>
+                            </div>
                             <div class="pc-detail" id="pcDetail_${i}">확인 중... · ${plan}</div>
                         </div>
                     </div>
@@ -2170,7 +2222,7 @@
         function enterControlScreen() {
             document.getElementById('displayEmail').textContent = currentUser.email;
             document.getElementById('displayPlan').textContent = selectedPcData.타입 || '--';
-            document.getElementById('selectedPcName').textContent = selectedPcData.사용자정보 || '내 PC';
+            document.getElementById('selectedPcName').textContent = getPcDisplayName(selectedPcData, currentUser.nodes.indexOf(selectedPcData));
 
             // 폰 연결됨 알림
             if (!TEST_MODE && selectedComputerId) {
