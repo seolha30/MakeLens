@@ -2215,12 +2215,10 @@
                     <div class="pc-item" onclick="choosePc(${i}, this)" data-index="${i}">
                         <div class="pc-status offline" id="pcStatus_${i}"></div>
                         <div class="pc-info">
-                            <div class="pc-name-row">
-                                <div class="pc-name">${name}</div>
-                                <button class="btn-edit-name" onclick="editPcNickname(${i}, event)" title="별명 변경">✏️</button>
-                            </div>
+                            <div class="pc-name">${name}</div>
                             <div class="pc-detail" id="pcDetail_${i}">확인 중... · ${plan}</div>
                         </div>
+                        <button class="btn-edit-name" onclick="editPcNickname(${i}, event)" title="별명 변경">✏️</button>
                     </div>
                 `;
             }).join('');
@@ -3481,7 +3479,7 @@
                     <span style="font-size: 11px; color: #666;">${s.lines}대사</span>
                     <span style="font-size: 10px; color: ${s.gender === 'male' ? '#5B9EFF' : s.gender === 'female' ? '#FF7EB3' : 'transparent'};">${s.gender === 'male' ? '♂' : s.gender === 'female' ? '♀' : ''}</span>
                     <button class="speaker-voice-btn" style="flex:1;" onclick="openVoicePicker('elevenlabs','${s.name}')">${s.voice || '미지정'}</button>
-                    <div style="width:100%; display:flex; gap:4px; margin-top:4px; padding-left:20px;">
+                    <div style="width:100%; display:flex; gap:4px; margin-top:4px;">
                         <div style="flex:1;"><div style="font-size:9px;color:#667eea;margin-bottom:2px;">모델</div><select class="speaker-select" style="width:100%;" data-speaker="${s.name}" data-field="model_id" onchange="onElSpeakerOptionChange(this)">
                             <option value="eleven_v3" ${mid==='eleven_v3'?'selected':''}>v3 최신</option><option value="eleven_multilingual_v2" ${mid==='eleven_multilingual_v2'?'selected':''}>다국어v2</option><option value="eleven_turbo_v2_5" ${mid==='eleven_turbo_v2_5'?'selected':''}>터보v2.5</option>
                         </select></div>
@@ -3519,7 +3517,7 @@
                     <span style="font-size: 11px; color: #666;">${s.lines}대사</span>
                     <span style="font-size: 10px; color: ${s.gender === 'male' ? '#5B9EFF' : s.gender === 'female' ? '#FF7EB3' : 'transparent'};">${s.gender === 'male' ? '♂' : s.gender === 'female' ? '♀' : ''}</span>
                     <button class="speaker-voice-btn" style="flex:1;" onclick="openVoicePicker('typecast','${s.name}')">${s.voice || '미지정'}</button>
-                    <div style="width:100%; display:flex; gap:4px; margin-top:4px; padding-left:20px;">
+                    <div style="width:100%; display:flex; gap:4px; margin-top:4px;">
                         <div style="flex:1;"><div style="font-size:9px;color:#667eea;margin-bottom:2px;">감정</div><select class="speaker-select" style="width:100%;" data-speaker="${s.name}" data-field="emotion" onchange="onTcSpeakerOptionChange(this)">
                             <option value="auto" ${em==='auto'?'selected':''}>🤖자동</option><option value="happy" ${em==='happy'?'selected':''}>😊기쁨</option><option value="sad" ${em==='sad'?'selected':''}>😢슬픔</option><option value="angry" ${em==='angry'?'selected':''}>😠화남</option><option value="whisper" ${em==='whisper'?'selected':''}>🤫속삭임</option>
                         </select></div>
