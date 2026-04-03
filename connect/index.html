@@ -2242,10 +2242,28 @@
         function switchToPc(index) {
             const node = currentUser.nodes[index];
             if (node.key === selectedPcKey) { document.getElementById('pcSwitchDropdown').style.display = 'none'; return; }
+
+            // 이전 PC 정리: 리스너 해제 + 연결 해제 알림
+            if (window._onlineSource) { window._onlineSource.close(); window._onlineSource = null; }
+            if (window._statusSource) { window._statusSource.close(); window._statusSource = null; }
+            if (window._currentProjectSource) { window._currentProjectSource.close(); window._currentProjectSource = null; }
+            if (!TEST_MODE && selectedComputerId) {
+                firebaseSet(`remote/${selectedComputerId}/phone_connected`, false).catch(() => {});
+            }
+
+            // 새 PC로 전환
             selectedPcKey = node.key;
             selectedPcData = node;
             selectedComputerId = node.컴퓨터ID;
             document.getElementById('pcSwitchDropdown').style.display = 'none';
+
+            // 프로젝트 목록 초기화 후 새로 진입
+            const select = document.getElementById('projectSelect');
+            select.innerHTML = '<option value="">프로젝트를 선택하세요</option><option value="__new__">＋ 새 프로젝트</option>';
+            document.getElementById('tabNav').style.display = 'none';
+            document.getElementById('tab1Empty').style.display = '';
+            document.getElementById('tab1Content').style.display = 'none';
+
             enterControlScreen();
         }
 
