@@ -1209,13 +1209,14 @@
                             <div style="margin-bottom: 8px;">
                                 <input type="text" id="tkPromptDirective" placeholder="추가지시: 예) 모든 등장인물을 고양이로 표현해줘" style="width: 100%; padding: 9px 12px; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 8px; color: #fff; font-size: 12px; box-sizing: border-box;">
                             </div>
-                            <!-- 토글 2x2 그리드 -->
+                            <!-- 토글 옵션 -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px; margin-bottom: 8px;"><span style="font-size: 12px; color: #ccc;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #ccc;">이미지 자동 재시도</span><label class="toggle"><input type="checkbox" id="tkSleepMode"><span class="slider"></span></label></div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #ccc;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkVideo10sLabel">영상 10초 생성</span><label class="toggle"><input type="checkbox" id="tkVideo10s" disabled><span class="slider"></span></label></div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
                             </div>
+                            <!-- 숨김: 커넥트 딸깍은 항상 자동 재시도 -->
+                            <input type="checkbox" id="tkSleepMode" checked style="display:none;">
                         </div>
 
                         <!-- Step 2: AI 음성 -->
@@ -2399,6 +2400,10 @@
             }
 
             // 온라인 상태: 실시간 감시 (EventSource, 연결 1회만)
+            if (window._onlineSource) {
+                try { window._onlineSource.close(); } catch(e) {}
+                window._onlineSource = null;
+            }
             try {
                 const onlineSource = firebaseListen(`remote/${selectedComputerId}/online`, (data) => {
                     const isOnline = data === true;
@@ -2423,6 +2428,10 @@
         let _currentProjectInitial = true; // 첫 이벤트(잔여 값) 무시용
         function listenCurrentProject() {
             _currentProjectInitial = true;
+            if (window._currentProjectSource) {
+                try { window._currentProjectSource.close(); } catch(e) {}
+                window._currentProjectSource = null;
+            }
             try {
                 const src = firebaseListen(`remote/${selectedComputerId}/current_project`, async (projectName) => {
                     // 첫 이벤트는 Firebase에 남아있는 이전 값 → 무시
@@ -2620,6 +2629,10 @@
 
         function listenRemoteStatus() {
             if (TEST_MODE) return;
+            if (window._statusSource) {
+                try { window._statusSource.close(); } catch(e) {}
+                window._statusSource = null;
+            }
             _statusInitial = true;
             try {
                 const statusSource = firebaseListen(`remote/${selectedComputerId}/status`, (status) => {
@@ -3436,6 +3449,7 @@
             const eventSource = firebaseListen(`remote/${selectedComputerId}/status`, (status) => {
                 if (!status) return;
 
+
                 // 각 단계별 상태 업데이트
                 const stepMap = {
                     scenes: { icon: { waiting: '⏳', running: '🔄', done: '✅', success: '✅', error: '❌' } },
@@ -3502,12 +3516,15 @@
                     if (Notification.permission === 'granted') {
                         new Notification('메이크렌즈', { body: '딸깍이 완료되었습니다!' });
                     }
-                    // 2초 후 오버레이 닫기 + 프로젝트 데이터 갱신
-                    setTimeout(() => {
+                    // 2초 후 감시 끊고 → 데이터 받고 → 팝업 닫기
+                    setTimeout(async () => {
+                        if (progressListener) { progressListener(); progressListener = null; }
+                        try {
+                            const cp = document.getElementById('projectSelect').value;
+                            if (cp && cp !== '' && cp !== '__new__') await loadProjectData(cp);
+                        } catch(e) {}
                         _ttalkkakRunning = false;
                         document.getElementById('progressPanelOverlay').style.display = 'none';
-                        const cp = document.getElementById('projectSelect').value;
-                        if (cp && cp !== '' && cp !== '__new__') loadProjectData(cp);
                     }, 2000);
                 } else if (status.overall === 'error') {
                     _stopAllStepTimers();
@@ -3515,6 +3532,7 @@
                     document.getElementById('progressSpinner').style.display = 'none';
                     document.getElementById('btnStop').style.display = 'none';
                     showAlert('오류가 발생했습니다: ' + (status.error_message || ''), 'error');
+                    if (progressListener) { progressListener(); progressListener = null; }
                     setTimeout(() => { _ttalkkakRunning = false; document.getElementById('progressPanelOverlay').style.display = 'none'; }, 3000);
                 } else if (status.overall === 'stopped') {
                     _stopAllStepTimers();
@@ -3522,6 +3540,7 @@
                     document.getElementById('progressSpinner').style.display = 'none';
                     document.getElementById('btnStop').style.display = 'none';
                     showAlert('딸깍이 중단되었습니다', 'warning');
+                    if (progressListener) { progressListener(); progressListener = null; }
                     setTimeout(() => { _ttalkkakRunning = false; document.getElementById('progressPanelOverlay').style.display = 'none'; }, 2000);
                 }
             });
@@ -4817,6 +4836,9 @@
                     action: 'regenerate_single_image',
                     scene_no: sceneNo,
                     model: document.getElementById('optImageModel').value,
+                    style: document.getElementById('optStyle').value,
+                    prompt_directive: document.getElementById('optPromptDirective').value,
+                    content_type: document.querySelector('input[name="scriptFormat"]:checked')?.value === 'longform' ? '롱폼' : '쇼츠',
                     timestamp: Date.now()
                 });
             } catch (err) {
@@ -5125,13 +5147,34 @@
         });
 
         // 페이지 닫힐 때 (새로고침, 탭 닫기 등) 연결 해제
+        // 페이지 닫을 때: SSE 전부 끊기 + 폰 연결 해제
         window.addEventListener('beforeunload', () => {
+            try { if (window._onlineSource) window._onlineSource.close(); } catch(e) {}
+            try { if (window._statusSource) window._statusSource.close(); } catch(e) {}
+            try { if (window._currentProjectSource) window._currentProjectSource.close(); } catch(e) {}
             if (selectedComputerId) {
                 fetch(`${FIREBASE_DB_URL}/remote/${selectedComputerId}/phone_connected.json`, {
                     method: 'PUT',
                     body: 'false',
                     keepalive: true
                 });
+            }
+        });
+
+        // 폰 화면 꺼짐/백그라운드: SSE 끊기 → 화면 켜지면 재연결
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // 화면 꺼짐 → SSE 끊어서 연결 슬롯 반환
+                try { if (window._onlineSource) { window._onlineSource.close(); window._onlineSource = null; } } catch(e) {}
+                try { if (window._statusSource) { window._statusSource.close(); window._statusSource = null; } } catch(e) {}
+                try { if (window._currentProjectSource) { window._currentProjectSource.close(); window._currentProjectSource = null; } } catch(e) {}
+            } else {
+                // 화면 켜짐 → 재연결
+                if (selectedComputerId) {
+                    listenPcOnlineStatus();
+                    listenRemoteStatus();
+                    listenCurrentProject();
+                }
             }
         });
     </script>
@@ -5154,6 +5197,9 @@
             </div>
             <div id="loadingMessage" style="font-size:13px; color:#aaa; margin-bottom:20px; min-height:20px;"></div>
             <button onclick="stopExecution()" style="padding:12px 32px; background:#E74C3C; border:none; border-radius:10px; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">중단하기</button>
+            <div style="margin-top:12px;">
+                <button onclick="document.getElementById('loadingOverlay').style.display='none'; hideLoadingOverlay(0);" style="padding:8px 20px; background:transparent; border:1px solid #555; border-radius:8px; color:#888; font-size:11px; cursor:pointer;">닫기</button>
+            </div>
         </div>
     </div>
 </body>
