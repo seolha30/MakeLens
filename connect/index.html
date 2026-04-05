@@ -1244,17 +1244,21 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
                                     <div style="flex: 1;">
                                         <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">속도</div>
                                         <select id="tkGeminiSpeed" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px;">
                                             <option value="0.8">0.8x 느림</option><option value="0.9">0.9x</option><option value="1.0">1.0x 보통</option><option value="1.1" selected>1.1x 기본</option><option value="1.2">1.2x</option><option value="1.3">1.3x 빠름</option><option value="1.5">1.5x</option><option value="2.0">2.0x 최대</option>
                                         </select>
                                     </div>
-                                    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 2px;">
-                                        <span style="font-size: 12px; color: #aaa; white-space: nowrap;">500자 분할</span>
-                                        <label class="toggle"><input type="checkbox" id="tkGeminiSplit500" checked><span class="slider"></span></label>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 12px; color: #aaa; margin-bottom: 4px;">말투 세부 지시</div>
+                                        <input type="text" id="tkDirecting" placeholder="예: 친구한테 말하듯이" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 9px 10px; font-size: 12px; box-sizing: border-box;">
                                     </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+                                    <span style="font-size: 12px; color: #aaa;">500자 분할</span>
+                                    <label class="toggle"><input type="checkbox" id="tkGeminiSplit500" checked><span class="slider"></span></label>
                                 </div>
                             </div>
                             <!-- ElevenLabs 옵션 -->
@@ -1667,8 +1671,8 @@
 
                         <!-- 말투 세부지시 -->
                         <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">📝 말투 세부지시 (선택 사항)</div>
-                            <input type="text" id="geminiDirecting" placeholder="예: 뉴스 앵커처럼 깔끔하고 단호하게, 3초마다 끊어서 읽어줘" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">📝 말투 세부 지시 (선택)</div>
+                            <input type="text" id="geminiDirecting" placeholder="예: 20대 여성이 친구한테 말하듯이" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px; box-sizing: border-box;">
                         </div>
                     </div>
 
@@ -1798,6 +1802,22 @@
                                 <option value="floating">☁️ 유영 효과 (몽환적 플로팅)</option>
                                 <option value="complex">🎥 복합 연출 (줌+패닝 조합)</option>
                                 <option value="mirror">🪞 좌우 반전 (미러링)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 효과음 / 배경음 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🔔 효과음</div>
+                            <select id="optSfx" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
+                                <option value="" selected>없음</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎵 배경음</div>
+                            <select id="optBgm" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
+                                <option value="" selected>없음</option>
                             </select>
                         </div>
                     </div>
@@ -3125,6 +3145,8 @@
                 if (split500El) split500El.checked = !!data.tts_split_500;
                 const directingEl = document.getElementById('geminiDirecting');
                 if (directingEl) directingEl.value = data.tts_directing || '';
+                const tkDirectingEl = document.getElementById('tkDirecting');
+                if (tkDirectingEl) tkDirectingEl.value = data.tts_directing || '';
 
                 // 음성 완료 기록 표시 (통합: 길이 + 시간)
                 const audioBar = document.getElementById('audioStatusBar');
@@ -3155,6 +3177,29 @@
                 setCheck('optSubtitleOn', data.subtitle_visible);
                 setSelectByValue(document.getElementById('optImageEffect'), EFFECT_MAP[data.image_effect] || 'none');
                 setSelectByValue(document.getElementById('optVideoEffect'), EFFECT_MAP[data.video_effect] || 'none');
+                // 탭4: 효과음/배경음 드롭다운 채우기 (PC 파일 목록)
+                if (data.sfx_list && data.sfx_list.length) {
+                    const optSfx = document.getElementById('optSfx');
+                    optSfx.innerHTML = '';
+                    data.sfx_list.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.value;
+                        opt.textContent = item.name;
+                        optSfx.appendChild(opt);
+                    });
+                    if (data.sound_effect) setSelectByValue(optSfx, data.sound_effect);
+                }
+                if (data.bgm_list && data.bgm_list.length) {
+                    const optBgm = document.getElementById('optBgm');
+                    optBgm.innerHTML = '';
+                    data.bgm_list.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.value;
+                        opt.textContent = item.name;
+                        optBgm.appendChild(opt);
+                    });
+                    if (data.background_music) setSelectByValue(optBgm, data.background_music);
+                }
                 // 딸깍 모달: 탭2 옵션 동기화 (모델, 스타일, 분할)
                 setSelectByValue(document.getElementById('tkModel'), data.selected_model_option);
                 setSelectByValue(document.getElementById('tkStyle'), data.selected_style_name);
@@ -3185,8 +3230,30 @@
                 setCheck('tkSubtitle', data.subtitle_visible !== false);
                 setCheck('tkSilence', !!data.auto_remove_silence);
                 setCheck('tkKeepAudio', !!data.keep_video_audio);
-                if (data.sound_effect) setSelectByValue(document.getElementById('tkSfx'), data.sound_effect === '' ? 'none' : 'pc_default');
-                if (data.background_music) setSelectByValue(document.getElementById('tkBgm'), data.background_music === '' ? 'none' : 'pc_default');
+                // 효과음 드롭다운 채우기 (PC 파일 목록)
+                if (data.sfx_list && data.sfx_list.length) {
+                    const sfxSel = document.getElementById('tkSfx');
+                    sfxSel.innerHTML = '';
+                    data.sfx_list.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.value;
+                        opt.textContent = item.name;
+                        sfxSel.appendChild(opt);
+                    });
+                    if (data.sound_effect) setSelectByValue(sfxSel, data.sound_effect);
+                }
+                // 배경음 드롭다운 채우기 (PC 파일 목록)
+                if (data.bgm_list && data.bgm_list.length) {
+                    const bgmSel = document.getElementById('tkBgm');
+                    bgmSel.innerHTML = '';
+                    data.bgm_list.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.value;
+                        opt.textContent = item.name;
+                        bgmSel.appendChild(opt);
+                    });
+                    if (data.background_music) setSelectByValue(bgmSel, data.background_music);
+                }
                 // 딸깍 모달: TTS 옵션 동기화
                 if (data.tts_provider) {
                     const tkProv = data.tts_provider === 'google' ? 'gemini' : data.tts_provider;
@@ -4185,6 +4252,7 @@
                 command.options.tts_style = document.getElementById('tkTtsStyle').value;
                 command.options.gemini_speed = parseFloat(document.getElementById('tkGeminiSpeed').value);
                 command.options.split_500 = document.getElementById('tkGeminiSplit500').checked;
+                command.options.directing = document.getElementById('tkDirecting').value;
             } else if (tkProvider === 'elevenlabs') {
                 command.options.el_model = document.getElementById('tkElModel').value;
                 command.options.el_stability = parseFloat(document.getElementById('tkElStability').value);
@@ -4313,6 +4381,8 @@
                     subtitle_on: document.getElementById('optSubtitleOn').checked,
                     image_effect: document.getElementById('optImageEffect').value,
                     video_effect: document.getElementById('optVideoEffect').value,
+                    sfx: document.getElementById('optSfx').value,
+                    bgm: document.getElementById('optBgm').value,
                 }
             };
 
@@ -4927,6 +4997,7 @@
             { tk: 'tkSplit', tab: 'optSplitMethod', type: 'select' },
             { tk: 'tkSplitCount', tab: 'optSplitCount', type: 'input' },
             // 탭3: 음성 (Gemini)
+            { tk: 'tkDirecting', tab: 'geminiDirecting', type: 'input' },
             { tk: 'tkVoice', tab: 'geminiVoice', type: 'select' },
             { tk: 'tkTtsStyle', tab: 'geminiStyle', type: 'select' },
             { tk: 'tkGeminiSpeed', tab: 'geminiSpeed', type: 'select' },
@@ -4939,6 +5010,8 @@
             { tk: 'tkImgEffect', tab: 'optImageEffect', type: 'select' },
             { tk: 'tkVidEffect', tab: 'optVideoEffect', type: 'select' },
             { tk: 'tkBoomerang', tab: 'optBoomerang', type: 'checkbox' },
+            { tk: 'tkSfx', tab: 'optSfx', type: 'select' },
+            { tk: 'tkBgm', tab: 'optBgm', type: 'select' },
         ];
 
         let _mirrorSyncing = false; // 무한루프 방지
