@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -1812,13 +1813,13 @@
                         <div style="flex: 1;">
                             <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🔔 효과음</div>
                             <select id="optSfx" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
-                                <option value="" selected>없음</option>
+                                <option value="none" selected>없음</option>
                             </select>
                         </div>
                         <div style="flex: 1;">
                             <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">🎵 배경음</div>
                             <select id="optBgm" style="width: 100%; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; padding: 10px 8px; font-size: 12px;">
-                                <option value="" selected>없음</option>
+                                <option value="none" selected>없음</option>
                             </select>
                         </div>
                     </div>
@@ -1928,6 +1929,11 @@
         });
 
         async function getAuthToken() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                _authToken = await user.getIdToken();  // 만료 시 자동 갱신
+                return _authToken;
+            }
             if (!_authToken) await _authReady;
             return _authToken;
         }
@@ -1966,9 +1972,10 @@
             let es;
             let closed = false;
 
-            function connect() {
+            async function connect() {
                 if (closed) return;
-                es = new EventSource(`${FIREBASE_DB_URL}/${path}.json?auth=${_authToken}`);
+                const token = await getAuthToken();
+                es = new EventSource(`${FIREBASE_DB_URL}/${path}.json?auth=${token}`);
                 es.addEventListener('put', (event) => {
                     try {
                         const parsed = JSON.parse(event.data);
@@ -2569,7 +2576,15 @@
                             }
                             listenProgress();
                         } else if (status.state === 'running') {
-                            showLoadingOverlay(status.message || '작업 진행 중...', status.start_time || 0);
+                            // 접속 시 복원: start_time이 5분 이상 지났으면 이미 끝난 작업으로 간주
+                            const elapsed = status.start_time ? (Date.now() / 1000 - status.start_time) : 0;
+                            if (elapsed > 300) {
+                                console.log('[Remote] 오래된 running 상태 무시:', elapsed, '초 경과');
+                            } else {
+                                showLoadingOverlay(status.message || '작업 진행 중...', status.start_time || 0);
+                            }
+                        } else if (status.state === 'completed' || status.state === 'error' || status.state === 'stopped') {
+                            // 이미 완료/에러/중단 상태면 로딩 안 띄움
                         }
                     }
                 } catch (e) {}
@@ -2647,6 +2662,12 @@
                     if (!st || st === '' ) return;
                     const progress = status.progress || 0;
 
+                    // 첫 이벤트는 Firebase에 남아있는 이전 상태 → running이면 무시 (복원 로직에서 이미 처리)
+                    if (_statusInitial) {
+                        _statusInitial = false;
+                        if (st === 'running') return;  // 이전 running 상태는 무시
+                    }
+
                     // PC 오프라인이면 status 무시 (옛날 값이 남아있을 수 있음)
                     const pcStatus = document.getElementById('selectedPcStatus');
                     if (pcStatus && pcStatus.classList.contains('offline')) return;
@@ -2674,10 +2695,14 @@
                         document.getElementById('loadingMessage').textContent = msg || '작업 완료';
                         document.getElementById('loadingBar').style.width = '100%';
                         hideLoadingOverlay(1500);
-                        // 프로젝트 데이터 갱신
+                        // 프로젝트 데이터 갱신 (현재 탭 유지)
                         const currentProject = document.getElementById('projectSelect').value;
                         if (currentProject && currentProject !== '' && currentProject !== '__new__') {
-                            loadProjectData(currentProject);
+                            const currentTab = document.querySelector('.tab-item.active');
+                            const currentTabIdx = currentTab ? parseInt(currentTab.dataset.tab) : 1;
+                            loadProjectData(currentProject).then(() => {
+                                switchTab(currentTabIdx);
+                            });
                         }
                     }
                     else if (st === 'error') {
@@ -2869,13 +2894,23 @@
 
             try {
                 const projects = await firebaseGet(`remote/${selectedComputerId}/projects`);
-                if (projects && typeof projects === 'object') {
-                    Object.entries(projects).forEach(([key, name]) => {
-                        const opt = document.createElement('option');
-                        opt.value = key;
-                        opt.textContent = name;
-                        select.appendChild(opt);
-                    });
+                if (projects) {
+                    // 리스트 형식 (순서 유지) 또는 기존 딕셔너리 형식 호환
+                    if (Array.isArray(projects)) {
+                        projects.forEach(p => {
+                            const opt = document.createElement('option');
+                            opt.value = p.key;
+                            opt.textContent = p.name;
+                            select.appendChild(opt);
+                        });
+                    } else if (typeof projects === 'object') {
+                        Object.entries(projects).forEach(([key, name]) => {
+                            const opt = document.createElement('option');
+                            opt.value = key;
+                            opt.textContent = name;
+                            select.appendChild(opt);
+                        });
+                    }
                 }
             } catch (e) {}
         }
@@ -3054,9 +3089,15 @@
                         container.innerHTML = data.scenes.map((s, i) => {
                             const sNo = s.No || (i+1);
                             const isPortrait = s.thumbnail_orientation === 'portrait';
-                            const regenBtns = `<div style="display:flex; gap:8px; margin-top:8px; border-top:1px solid #2a2c3e; padding-top:8px;">
-                                <button onclick="remoteRegenSingleImage('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#7aa2f7; font-size:12px; cursor:pointer;">🖼 이미지 재생성</button>
-                                <button onclick="remoteGenSingleVideo('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#9ece6a; font-size:12px; cursor:pointer;">🎬 동영상 생성</button>
+                            const regenBtns = `<div style="display:flex; flex-direction:column; gap:6px; margin-top:8px; border-top:1px solid #2a2c3e; padding-top:8px;">
+                                <div style="display:flex; gap:8px;">
+                                    <button onclick="remoteRegenImagePrompt('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#bb9af7; font-size:12px; cursor:pointer;">📝 이미지 프롬프트</button>
+                                    <button onclick="remoteRegenSingleVideoPrompt('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#e0af68; font-size:12px; cursor:pointer;">📝 동영상 프롬프트</button>
+                                </div>
+                                <div style="display:flex; gap:8px;">
+                                    <button onclick="remoteRegenSingleImage('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#7aa2f7; font-size:12px; cursor:pointer;">🖼 이미지 재생성</button>
+                                    <button onclick="remoteGenSingleVideo('${sNo}')" style="flex:1; padding:8px; background:#1e2030; border:1px solid #3a3c3e; border-radius:8px; color:#9ece6a; font-size:12px; cursor:pointer;">🎬 동영상 생성</button>
+                                </div>
                             </div>`;
                             const imgBorder = s.has_video ? 'border:2px solid #10B981; padding:3px;' : '';
 
@@ -3066,7 +3107,14 @@
                                 return `<div style="background:#12131a; border:1px solid #3a3c3e; border-radius:10px; overflow:hidden; margin-bottom:8px;">
                                     ${s.thumbnail_url ? `<div style="background:#000; text-align:center;" onclick="showImagePreview('${s.thumbnail_url}')"><img src="${s.thumbnail_url}" style="max-width:100%; max-height:${imgMaxHeight}; object-fit:contain; cursor:pointer; display:block; margin:0 auto; ${imgBorder} border-radius:4px;" onerror="this.parentElement.style.display='none'"></div>` : ''}
                                     <div style="padding:12px;">
-                                        <div style="font-size:11px; color:#2D7FF9; font-weight:700; margin-bottom:6px;">장면 #${sNo}</div>
+                                        <div style="font-size:11px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                                            <span style="color:#2D7FF9;">장면 #${sNo}</span>
+                                            ${(s.characters||[]).map(c => {
+                                                const colors = {char_1:['#B71C1C','#FFCDD2'],char_2:['#01579B','#B3E5FC'],char_3:['#004D40','#A5D6A7'],char_4:['#E65100','#FFE0B2'],char_5:['#4A148C','#E1BEE7'],char_6:['#00695C','#B2DFDB'],char_7:['#BF360C','#FFCCBC']};
+                                                const [fg,bg] = colors[c]||['#666','#ddd'];
+                                                return `<span style="background:${bg};color:${fg};font-size:10px;padding:1px 6px;border-radius:4px;font-weight:700;">${c}</span>`;
+                                            }).join('')}
+                                        </div>
                                         <div style="font-size:13px; color:#ddd; line-height:1.5;">${esc(s.narration)}</div>
                                         ${s.image_prompt ? `<div style="font-size:11px; color:#7aa2f7; border-top:1px solid #2a2c3e; padding-top:6px; margin-top:8px;">🖼 ${esc(s.image_prompt)}</div>` : ''}
                                         ${s.video_prompt ? `<div style="font-size:11px; color:#9ece6a; border-top:1px solid #2a2c3e; padding-top:6px; margin-top:6px;">🎬 ${esc(s.video_prompt)}</div>` : ''}
@@ -3114,7 +3162,7 @@
                             const found = _voiceListsCache.elevenlabs.find(v => v.voice_id === s.voice_id);
                             if (found) gender = found.gender || '';
                         }
-                        return { name, lines: speakerCounts[name], voice, gender };
+                        return { name, lines: speakerCounts[name], voice, gender, voice_id: s.voice_id || '', voice_name: s.voice_name || '', model_id: s.model_id || '', stability: s.stability || '', speed: s.speed || '' };
                     });
                     const tc_age_kr = {child:'아이',teenager:'청소년',young_adult:'청년',middle_age:'중년',elder:'노년'};
                     const tc_gender_kr = {male:'남성',female:'여성'};
@@ -3132,6 +3180,8 @@
                         return {
                             name, lines: speakerCounts[name],
                             voice,
+                            voice_id: s.voice_id || '',
+                            voice_name: s.voice_name || '',
                             gender: s.gender || '',
                             emotion: s.emotion || 'auto',
                             intensity: s.emotion_intensity ? (s.emotion_intensity <= 1 ? 'weak' : s.emotion_intensity >= 2 ? 'strong' : 'normal') : 'normal',
@@ -4012,10 +4062,15 @@
             // 화자별 설정 (목소리 변경 + 옵션) 통합
             const voiceSettings = window._pendingVoiceSettings || {};
 
+            // 화자모드 OFF면 나레이션(첫번째) 1명만, ON이면 전체 화자
+            const isSpeakerOn = document.getElementById('speakerModeToggle').checked;
+
             // 타캐: voice_id + 감정/강도/속도도 항상 포함
             if (currentTtsProvider === 'typecast' && dummySpeakersAll.tc) {
                 if (!voiceSettings.typecast) voiceSettings.typecast = {};
-                dummySpeakersAll.tc.forEach(s => {
+                const tcList = isSpeakerOn ? dummySpeakersAll.tc : [dummySpeakersAll.tc[0]];
+                tcList.forEach(s => {
+                    if (!s) return;
                     if (!voiceSettings.typecast[s.name]) voiceSettings.typecast[s.name] = {};
                     const vs = voiceSettings.typecast[s.name];
                     // voice_id가 아직 없으면 dummySpeakersAll에서 가져오기
@@ -4029,7 +4084,9 @@
             // 일레븐: voice_id + 모델/안정성/속도도 항상 포함
             if (currentTtsProvider === 'elevenlabs' && dummySpeakersAll.el) {
                 if (!voiceSettings.elevenlabs) voiceSettings.elevenlabs = {};
-                dummySpeakersAll.el.forEach(s => {
+                const elList = isSpeakerOn ? dummySpeakersAll.el : [dummySpeakersAll.el[0]];
+                elList.forEach(s => {
+                    if (!s) return;
                     if (!voiceSettings.elevenlabs[s.name]) voiceSettings.elevenlabs[s.name] = {};
                     const vs = voiceSettings.elevenlabs[s.name];
                     // voice_id가 아직 없으면 dummySpeakersAll에서 가져오기
@@ -4844,6 +4901,19 @@
                     style: document.getElementById('optStyle').value,
                     prompt_directive: document.getElementById('optPromptDirective').value,
                     content_type: document.querySelector('input[name="scriptFormat"]:checked')?.value === 'longform' ? '롱폼' : '쇼츠',
+                    timestamp: Date.now()
+                });
+            } catch (err) {
+                showAlert('요청 실패', 'error');
+            }
+        }
+
+        async function remoteRegenImagePrompt(sceneNo) {
+            if (TEST_MODE) { showAlert('이미지 프롬프트 재생성 요청', 'info'); return; }
+            try {
+                await firebaseSet(`remote/${selectedComputerId}/command`, {
+                    action: 'regenerate_image_prompt',
+                    scene_no: sceneNo,
                     timestamp: Date.now()
                 });
             } catch (err) {
