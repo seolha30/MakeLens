@@ -1900,6 +1900,8 @@
         // ═══════════════════════════════════════
         const TEST_MODE = false;  // true = 더미 데이터, false = 실제 Firebase
         const FIREBASE_DB_URL = 'https://makelens-fef98-default-rtdb.asia-southeast1.firebasedatabase.app';
+        const WORKER_URL = 'https://makelens-firebase.seolha30.workers.dev';
+        const WORKER_API_KEY = 'ml_fw_7n4k8x1m3p9q2v5w6j';
 
         // ═══════════════════════════════════════
         // Firebase 인증 (익명 — 사용자는 모름, URL 직접 접근만 차단)
@@ -2115,11 +2117,14 @@
                         return;
                     }
 
-                    // 2단계: Firebase에서 내 이메일 라이센스만 가져오기
-                    const token = await getAuthToken();
-                    const queryUrl = `${FIREBASE_DB_URL}/${encodeURIComponent('라이센스')}.json?auth=${token}&orderBy="${encodeURIComponent('이메일')}"&equalTo="${encodeURIComponent(email)}"`;
-                    const res = await fetch(queryUrl);
-                    const data = res.ok ? await res.json() : null;
+                    // 2단계: 서버를 통해 내 이메일 라이센스만 가져오기 (개인정보 보호)
+                    const licRes = await fetch(`${WORKER_URL}/license/query-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': WORKER_API_KEY },
+                        body: JSON.stringify({ email })
+                    });
+                    const licResult = licRes.ok ? await licRes.json() : null;
+                    const data = licResult && licResult.success ? licResult.data : null;
 
                     if (!data || Object.keys(data).length === 0) {
                         showAlert('등록된 라이센스가 없습니다', 'error');
