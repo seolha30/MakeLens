@@ -1206,15 +1206,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 추가지시 -->
+                            <!-- 사전지시 -->
+                            <div style="margin-bottom: 4px;">
+                                <input type="text" id="tkPromptDirective" placeholder="프롬프트 지시: 예) 배경에 벚꽃을 넣어줘" style="width: 100%; padding: 9px 12px; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 8px; color: #fff; font-size: 12px; box-sizing: border-box;">
+                            </div>
                             <div style="margin-bottom: 8px;">
-                                <input type="text" id="tkPromptDirective" placeholder="추가지시: 예) 모든 등장인물을 고양이로 표현해줘" style="width: 100%; padding: 9px 12px; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 8px; color: #fff; font-size: 12px; box-sizing: border-box;">
+                                <input type="text" id="tkCharacterDirective" placeholder="캐릭터 지시: 예) 모든 캐릭터를 귀여운 동물로" style="width: 100%; padding: 9px 12px; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 8px; color: #fff; font-size: 12px; box-sizing: border-box;">
                             </div>
                             <!-- 토글 옵션 -->
-                            <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px; margin-bottom: 8px;"><span style="font-size: 12px; color: #ccc;">동영상 생성 (Grok)</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkVideo10sLabel">영상 10초 생성</span><label class="toggle"><input type="checkbox" id="tkVideo10s" disabled><span class="slider"></span></label></div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 12px;"><span style="font-size: 12px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 10px;"><span style="font-size: 11px; color: #ccc;">Grok 영상생성</span><label class="toggle"><input type="checkbox" id="tkVideoGen" onchange="onTkVideoGenChange()"><span class="slider"></span></label></div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 10px;"><span style="font-size: 11px; color: #555;" id="tkVideo10sLabel">10초 생성</span><label class="toggle"><input type="checkbox" id="tkVideo10s" disabled><span class="slider"></span></label></div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: #0d0e14; border: 1px solid #2a2c34; border-radius: 10px; padding: 8px 10px;"><span style="font-size: 11px; color: #555;" id="tkBoomerangLabel">부메랑 재생</span><label class="toggle"><input type="checkbox" id="tkBoomerang" disabled><span class="slider"></span></label></div>
                             </div>
                             <!-- 숨김: 커넥트 딸깍은 항상 자동 재시도 -->
                             <input type="checkbox" id="tkSleepMode" checked style="display:none;">
@@ -1545,10 +1548,14 @@
                         </div>
                     </div>
 
-                    <!-- 프롬프트 추가지시 -->
+                    <!-- 사전지시 -->
+                    <div style="margin-bottom: 6px;">
+                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">✏️ 프롬프트 지시</div>
+                        <input type="text" id="optPromptDirective" placeholder="예: 배경에 벚꽃을 넣어줘" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px;">
+                    </div>
                     <div style="margin-bottom: 12px;">
-                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">✏️ 프롬프트 추가지시</div>
-                        <input type="text" id="optPromptDirective" placeholder="예: 사람이 등장하는 장면에 주변 인물도 함께 배치" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px;">
+                        <div style="font-size: 13px; color: #aaa; font-weight: 600; margin-bottom: 6px;">👤 캐릭터 지시</div>
+                        <input type="text" id="optCharacterDirective" placeholder="예: 모든 캐릭터를 귀여운 동물로" style="width: 100%; padding: 10px 14px; background: #12131a; border: 1px solid #3a3c3e; border-radius: 8px; color: #fff; font-size: 13px;">
                     </div>
 
                     <!-- 실행 버튼들 -->
@@ -3065,6 +3072,8 @@
                 setSelectByValue(document.getElementById('optImageModel'), data.selected_model_option);
                 const directiveEl = document.getElementById('optPromptDirective');
                 if (directiveEl) directiveEl.value = data.prompt_directive || '';
+                const charDirectiveEl = document.getElementById('optCharacterDirective');
+                if (charDirectiveEl) charDirectiveEl.value = data.character_directive || '';
                 // 분할 방법
                 if (data.scene_split !== undefined) {
                     const splitVal = data.scene_split;
@@ -3283,9 +3292,11 @@
                     }
                 }
                 // 딸깍 모달: 탭4 옵션 동기화
-                // 추가지시
+                // 사전지시
                 const tkPd = document.getElementById('tkPromptDirective');
                 if (tkPd) tkPd.value = data.prompt_directive || '';
+                const tkCd = document.getElementById('tkCharacterDirective');
+                if (tkCd) tkCd.value = data.character_directive || '';
                 // 이미지 자동 재시도
                 setCheck('tkSleepMode', !!data.sleep_mode);
                 setCheck('tkVideoGen', data.video_generation);
@@ -4317,6 +4328,7 @@
                     sfx: document.getElementById('tkSfx').value,
                     bgm: document.getElementById('tkBgm').value,
                     prompt_directive: document.getElementById('tkPromptDirective').value,
+                    character_directive: document.getElementById('tkCharacterDirective').value,
                     sleep_mode: document.getElementById('tkSleepMode').checked,
                     video_generation: document.getElementById('tkVideoGen').checked,
                     video_10s_mode: document.getElementById('tkVideo10s').checked,
@@ -4900,6 +4912,7 @@
                     model: document.getElementById('optImageModel').value,
                     style: document.getElementById('optStyle').value,
                     prompt_directive: document.getElementById('optPromptDirective').value,
+                    character_directive: document.getElementById('optCharacterDirective').value,
                     content_type: document.querySelector('input[name="scriptFormat"]:checked')?.value === 'longform' ? '롱폼' : '쇼츠',
                     timestamp: Date.now()
                 });
@@ -4976,6 +4989,7 @@
                     split_count: parseInt(document.getElementById('optSplitCount').value) || 8,
                     model: document.getElementById('optImageModel').value,
                     prompt_directive: document.getElementById('optPromptDirective').value,
+                    character_directive: document.getElementById('optCharacterDirective').value,
                     content_type: document.querySelector('input[name="scriptFormat"][value="shorts"]').checked ? '쇼츠' : '롱폼',
                     auto_retry: true,
                 }
@@ -5089,6 +5103,7 @@
         const MIRROR_PAIRS = [
             // 탭2: 장면/이미지
             { tk: 'tkPromptDirective', tab: 'optPromptDirective', type: 'input' },
+            { tk: 'tkCharacterDirective', tab: 'optCharacterDirective', type: 'input' },
             { tk: 'tkModel', tab: 'optImageModel', type: 'select' },
             { tk: 'tkStyle', tab: 'optStyle', type: 'select' },
             { tk: 'tkSplit', tab: 'optSplitMethod', type: 'select' },
