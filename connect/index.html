@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -4328,7 +4327,7 @@
                     sfx: document.getElementById('tkSfx').value,
                     bgm: document.getElementById('tkBgm').value,
                     prompt_directive: document.getElementById('tkPromptDirective').value,
-                    character_directive: document.getElementById('tkCharacterDirective').value,
+                    character_directive: (document.getElementById('tkCharacterDirective') || {}).value || '',
                     sleep_mode: document.getElementById('tkSleepMode').checked,
                     video_generation: document.getElementById('tkVideoGen').checked,
                     video_10s_mode: document.getElementById('tkVideo10s').checked,
@@ -4912,7 +4911,7 @@
                     model: document.getElementById('optImageModel').value,
                     style: document.getElementById('optStyle').value,
                     prompt_directive: document.getElementById('optPromptDirective').value,
-                    character_directive: document.getElementById('optCharacterDirective').value,
+                    character_directive: (document.getElementById('optCharacterDirective') || {}).value || '',
                     content_type: document.querySelector('input[name="scriptFormat"]:checked')?.value === 'longform' ? '롱폼' : '쇼츠',
                     timestamp: Date.now()
                 });
@@ -4989,7 +4988,7 @@
                     split_count: parseInt(document.getElementById('optSplitCount').value) || 8,
                     model: document.getElementById('optImageModel').value,
                     prompt_directive: document.getElementById('optPromptDirective').value,
-                    character_directive: document.getElementById('optCharacterDirective').value,
+                    character_directive: (document.getElementById('optCharacterDirective') || {}).value || '',
                     content_type: document.querySelector('input[name="scriptFormat"][value="shorts"]').checked ? '쇼츠' : '롱폼',
                     auto_retry: true,
                 }
