@@ -1,7 +1,7 @@
 # MakeLens 공지사항
 
 게시일: 2026-05-04
-[![무료특강](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/tacax4.jpg)](https://www.tubelens.kr/liteplan20/)
+[![타입캐스트 20만 무료 크레딧 받기!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/tacax4.jpg)](https://www.tubelens.kr/liteplan20/)
 
 ## 메이크렌즈 1.6.9 업데이트
 1) 효과음 개별 선택🎵
