@@ -2,7 +2,6 @@
 
 게시일: 2026-05-04
 ![공지이미지](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/tacax2.jpg)
-
 ## 메이크렌즈 1.6.9 업데이트
 1) 효과음 개별 선택🎵
 : 체크박스로 여러 개 골라 사용
