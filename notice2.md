@@ -1,7 +1,7 @@
 # MakeLens 공지사항
 
 게시일: 2026-05-04
-![공지이미지](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/freeclass.jpg)
+[![무료특강](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/freeclass.jpg)](https://www.tubelens.kr/)
 
 ## 메이크렌즈 1.6.9 업데이트
 1) 효과음 개별 선택🎵
