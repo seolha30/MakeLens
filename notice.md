@@ -1,6 +1,6 @@
 # MakeLens 공지사항
 
-게시일: 2026-05-04
+게시일: 2026-05-09
 [![타입캐스트 20만 무료 크레딧 받기!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/tacax4.jpg)](https://www.tubelens.kr/liteplan20/)
 
 ## 메이크렌즈 1.7.0 업데이트
