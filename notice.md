@@ -1,6 +1,11 @@
 # MakeLens 공지사항
 
-게시일: 2026-05-14
+게시일: 2026-07-03
+## 메이크렌즈 1.7.2 업데이트
+- 타입캐스트 목소리 추가
+- 그록 UI 변경으로 인한 수정 : 메이크렌즈 오토 재설치/새로고침 필수
+
+
 [![New 자막 지우개 기능!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/era.jpg)](https://youtu.be/2nuKhC9RACU)
 <br>
 [![타입캐스트 20만 무료 크레딧 받기!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/tacax4.jpg)](https://www.tubelens.kr/liteplan20/)
