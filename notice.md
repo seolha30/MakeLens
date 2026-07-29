@@ -2,7 +2,7 @@
 
 게시일: 2026-07-29
 ## 안내사항
-[![업데이트 공지!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/update.jpg)]
+![업데이트 공지!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/update.jpg)
 - 현재 그록 UI가 변경되었습니다.
 - 빠른 시일내에 새로운 그록 UI 파악하여 업데이트 할 수 있도록 하겠습니다.
 - 조금만 기다려주세요! :)
