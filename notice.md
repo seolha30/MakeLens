@@ -1,11 +1,8 @@
 # MakeLens 공지사항
 
-게시일: 2026-07-29
-## 안내사항
-![업데이트 공지!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/update.jpg)
-- 현재 그록 UI가 변경되었습니다.
-- 빠른 시일내에 새로운 그록 UI 파악하여 업데이트 할 수 있도록 하겠습니다.
-- 조금만 기다려주세요! :)
+게시일: 2026-07-30
+## 메이크렌즈 1.7.7 업데이트
+- 그록 UI 변경으로 인한 수정 : 메이크렌즈 오토 재설치/새로고침 필수!!
 
 
 ## 메이크렌즈 1.7.6 업데이트
@@ -20,8 +17,7 @@
 
 ## 메이크렌즈 1.7.2 업데이트
 - 타입캐스트 목소리 추가
-- 그록 UI 변경으로 인한 수정 : 메이크렌즈 오토 재설치/새로고침 필수
-
+- 그록 UI 변경으로 인한 수정
 
 [![New 자막 지우개 기능!](https://raw.githubusercontent.com/seolha30/Tubelens/refs/heads/main/era.jpg)](https://youtu.be/2nuKhC9RACU)
 <br>
