@@ -2134,7 +2134,7 @@
                     const licRes = await fetch(`${WORKER_URL}/license/query-email`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-API-Key': WORKER_API_KEY },
-                        body: JSON.stringify({ email })
+                        body: JSON.stringify({ email, phone })
                     });
                     const licResult = licRes.ok ? await licRes.json() : null;
                     const data = licResult && licResult.success ? licResult.data : null;
